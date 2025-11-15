@@ -9,10 +9,12 @@ lerna-debug.log*
 
 # Dependencies
 node_modules/
+**/node_modules/
 
 # Build outputs
 dist/
 dist-ssr/
+**/dist/
 
 # Editor directories and files
 .vscode/*
@@ -44,8 +46,9 @@ tmp/
 *.temp
 
 # Results (keep public directory but exclude results within it)
-agent/results/
-**/public/*
+results/
+**/public/results/
+**/public/requested/
 
 # OS files
 .DS_Store

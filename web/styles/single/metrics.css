@@ -1,0 +1,324 @@
+.section-metrics .metrics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.section-metrics .metrics-section {
+  background: rgba(40, 10, 112, 0.05);
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.section-metrics .metrics-section h2 {
+  font-size: 1.5rem;
+  margin: 0 0 1.5rem 0;
+  color: #280a70;
+  font-weight: 600;
+}
+
+/* CWV Section */
+.section-metrics .cwv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.section-metrics .metric-card {
+  background: rgba(224, 224, 224, 0.5);
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section-metrics .metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 10, 112, 0.2);
+}
+
+.section-metrics .metric-card.good {
+  border-color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.section-metrics .metric-card.needs-improvement {
+  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.section-metrics .metric-card.poor {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.section-metrics .metric-card.neutral {
+  border-color: rgba(255, 107, 53, 0.2);
+  background: rgba(224, 224, 224, 0.5);
+}
+
+.section-metrics .metric-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #280a70;
+  display: block;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+
+.section-metrics .metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: #280a70;
+  display: block;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+}
+
+.section-metrics .metric-card.good .metric-value {
+  color: #15803d;
+}
+
+.section-metrics .metric-card.needs-improvement .metric-value {
+  color: #ca8a04;
+}
+
+.section-metrics .metric-card.poor .metric-value {
+  color: #b91c1c;
+}
+
+.section-metrics .metric-description {
+  font-size: 0.75rem;
+  color: #280a70;
+  margin-top: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Navigation Timings Bar */
+.section-metrics .navigation-timings-bar {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  background: rgba(40, 10, 112, 0.1);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.section-metrics .timing-phase {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  transition: opacity 0.1s ease;
+  border-right: 1px solid rgba(40, 10, 112, 0.2);
+}
+
+.section-metrics .performance-box:hover,
+.section-metrics .timing-phase:hover {
+  opacity: 0.9;
+}
+
+.section-metrics .performance-box {
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-metrics .performance-box.performance-dns,
+.section-metrics .timing-phase.dns {
+  background: rgb(59, 130, 246);
+}
+
+.section-metrics .performance-box.performance-connect,
+.section-metrics .timing-phase.connect {
+  background: rgb(5, 150, 105);
+}
+
+.section-metrics .performance-box.performance-request,
+.section-metrics .timing-phase.request {
+  background: rgb(217, 119, 6);
+}
+
+.section-metrics .performance-box.performance-response,
+.section-metrics .timing-phase.response {
+  background: rgb(147, 51, 234);
+}
+
+.section-metrics .performance-box.performance-dom,
+.section-metrics .timing-phase.dom {
+  background: rgb(219, 39, 119);
+}
+
+.section-metrics .performance-box.performance-dom-complete,
+.section-metrics .timing-phase.dom-complete {
+  background: rgb(2, 132, 199);
+}
+
+.section-metrics .performance-box.performance-load,
+.section-metrics .timing-phase.load {
+  background: rgb(22, 163, 74);
+}
+
+.section-metrics .navigation-timings-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.section-metrics .timing-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: rgba(40, 10, 112, 0.05);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.section-metrics .timing-name {
+  color: #280a70;
+  font-weight: 500;
+}
+
+.section-metrics .timing-value {
+  font-family: monospace;
+  font-weight: 600;
+  color: #280a70;
+}
+
+/* Performance Metrics */
+.section-metrics .performance-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.section-metrics .performance-metric {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(40, 10, 112, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 107, 53, 0.2);
+  white-space: nowrap;
+}
+
+.section-metrics .performance-label {
+  color: #280a70;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.section-metrics .performance-value {
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #280a70;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Server Timings & User Timings Tables */
+.section-metrics .server-timings-table,
+.section-metrics .user-timings-table {
+  overflow-x: auto;
+}
+
+.section-metrics .server-timings-table table,
+.section-metrics .user-timings-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.section-metrics .server-timings-table th,
+.section-metrics .user-timings-table th {
+  background: rgba(40, 10, 112, 0.1);
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #280a70;
+  border-bottom: 2px solid rgba(255, 107, 53, 0.3);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-metrics .server-timings-table td,
+.section-metrics .user-timings-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(40, 10, 112, 0.1);
+  color: #280a70;
+  font-size: 0.9rem;
+}
+
+.section-metrics .server-timings-table tbody tr:hover,
+.section-metrics .user-timings-table tbody tr:hover {
+  background: rgba(40, 10, 112, 0.05);
+}
+
+.section-metrics .timing-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(255, 107, 53, 0.15);
+  color: #c04a1a;
+  border: 1px solid #ff6b35;
+}
+
+.section-metrics .no-data {
+  color: #280a70;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .section-metrics .metrics-container {
+    gap: 1.5rem;
+  }
+
+  .section-metrics .metrics-section {
+    padding: 1rem;
+  }
+
+  .section-metrics .metrics-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .section-metrics .cwv-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-metrics .navigation-timings-details {
+    grid-template-columns: 1fr;
+  }
+
+  .section-metrics .performance-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-metrics .metrics-section h2 {
+    font-size: 1.2rem;
+  }
+
+  .section-metrics .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .section-metrics .navigation-timings-bar {
+    height: 40px;
+  }
+}
