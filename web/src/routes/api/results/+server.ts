@@ -24,6 +24,31 @@ export const GET: RequestHandler = async () => {
         let engineUrl: string | null = null;
         let screenshotUrl: string | null = null;
         // Try to read config
+        // Try to read HAR file to get creator, browser (name & version), and page title
+        const harPath = join(resultsDir, testId, 'pageload.har');
+        let harCreator: { name: string, version: string } | null = null;
+        let harBrowser: { name: string, version: string } | null = null;
+        let pageTitle: string | null = null;
+        if (existsSync(harPath)) {
+          try {
+            const harData = JSON.parse(readFileSync(harPath, 'utf-8'));
+            if (harData.creator) {
+              harCreator = {
+                name: harData.creator.name,
+                version: harData.creator.version
+              };
+            }
+            if (harData.browser) {
+              // Overwrite browser and version using HAR, if available
+              browser = `${harData.browser.name} ${harData.browser.version}`;
+            }
+            if (harData.pages && Array.isArray(harData.pages) && harData.pages.length > 0) {
+              pageTitle = harData.pages[0].title;
+            }
+          } catch (err) {
+            console.error(`Error reading HAR for ${testId}:`, err);
+          }
+        }
         if (existsSync(configPath)) {
           try {
             const config = JSON.parse(readFileSync(configPath, 'utf-8'));

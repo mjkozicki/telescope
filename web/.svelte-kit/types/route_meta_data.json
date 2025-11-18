@@ -4,6 +4,9 @@
 	"/api/results": [
 		"src/routes/api/results/+server.ts"
 	],
+	"/api/results/[testId]": [
+		"src/routes/api/results/[testId]/+server.ts"
+	],
 	"/api/submit-test": [
 		"src/routes/api/submit-test/+server.ts"
 	],

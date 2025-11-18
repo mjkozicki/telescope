@@ -13,24 +13,7 @@
 </script>
 
 <div class="result-container">
-  {#if data.config}
-    <div class="result-header">
-      <div class="result-info">
-        <h2 class="result-title">
-          {data.config.url || 'Test Result'}
-        </h2>
-        <div class="result-meta">
-          <span class="test-id" title={testId}>ID: {displayId}</span>
-          {#if data.config.browser}
-            <span class="browser">Browser: {data.config.browser}</span>
-          {/if}
-          {#if data.config.connectionType}
-            <span class="connection">Network: {data.config.connectionType}</span>
-          {/if}
-        </div>
-      </div>
-    </div>
-  {:else if !data.exists}
+  {#if !data.exists}
     <div class="result-header warning">
       <p>⚠️ Test data for <code>{testId}</code> not found or still loading.</p>
     </div>
@@ -67,39 +50,6 @@
     font-family: monospace;
   }
 
-  .result-info {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-
-  .result-title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-primary);
-    margin: 0;
-    word-break: break-all;
-  }
-
-  .result-meta {
-    display: flex;
-    gap: var(--spacing-lg);
-    flex-wrap: wrap;
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .result-meta span {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-
-  .test-id {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: 0.85rem;
-  }
-
   .result-content {
     width: 100%;
   }
@@ -107,15 +57,6 @@
   @media (max-width: 768px) {
     .result-header {
       padding: var(--spacing-md);
-    }
-
-    .result-title {
-      font-size: var(--font-size-lg);
-    }
-
-    .result-meta {
-      flex-direction: column;
-      gap: var(--spacing-xs);
     }
   }
 </style>

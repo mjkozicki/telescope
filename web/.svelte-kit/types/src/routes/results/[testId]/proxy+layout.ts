@@ -6,33 +6,44 @@ export const load = async ({ params, fetch }: Parameters<LayoutLoad>[0]) => {
   const { testId } = params;
   
   try {
-    // Try to load test data
-    // In production, this would fetch from your data source
-    // For now, we'll load from static public/results folder if it exists
+    // Load test data from API endpoint
+    const response = await fetch(`/api/results/${testId}`);
     
-    const manifestResponse = await fetch(`/test-results/${testId}/manifest.json`);
-    const configResponse = await fetch(`/test-results/${testId}/config.json`);
-    const metricsResponse = await fetch(`/test-results/${testId}/metrics.json`);
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw error(404, `Test ${testId} not found`);
+      }
+      throw error(response.status, 'Failed to load test data');
+    }
     
-    const manifest = manifestResponse.ok ? await manifestResponse.json() : null;
-    const config = configResponse.ok ? await configResponse.json() : null;
-    const metrics = metricsResponse.ok ? await metricsResponse.json() : null;
+    const data = await response.json();
     
     return {
-      testId,
-      manifest,
-      config,
-      metrics,
-      exists: manifest !== null || config !== null
+      testId: data.testId,
+      manifest: data.manifest,
+      config: data.config,
+      metrics: data.metrics,
+      resources: data.resources,
+      console: data.console,
+      har: data.har,
+      exists: data.exists
     };
   } catch (err) {
-    // If data doesn't exist, still return testId so navigation works
-    // Pages can handle missing data gracefully
+    // Re-throw SvelteKit errors
+    if (err && typeof err === 'object' && 'status' in err) {
+      throw err;
+    }
+    
+    // For other errors, return empty data
+    console.error(`Error loading test ${testId}:`, err);
     return {
       testId,
       manifest: null,
       config: null,
       metrics: null,
+      resources: null,
+      console: null,
+      har: null,
       exists: false
     };
   }

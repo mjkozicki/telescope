@@ -56,20 +56,6 @@
     margin-bottom: var(--spacing-md);
   }
 
-  .sample-link {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-light);
-  }
-
-  .sample-link a {
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .sample-link a:hover {
-    text-decoration: underline;
-  }
-
   .results-list {
     list-style: none;
     padding: 0;
