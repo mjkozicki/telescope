@@ -76,7 +76,7 @@
   {:else}
     <!-- Core Web Vitals -->
     <section class="metrics-section">
-      <h3>Core Web Vitals & Duration</h3>
+      <h3>Core Web Vitals</h3>
       <div class="cwv-grid">
         <div class="metric-card {getVitalClass('lcp', lcp)}">
           <div class="metric-label">LCP</div>
@@ -95,18 +95,6 @@
           <div class="metric-value">{formatCLS(cls)}</div>
           <div class="metric-description">Cumulative Layout Shift</div>
         </div>
-        
-        <div class="metric-card {getVitalClass('ttfb', ttfb)}">
-          <div class="metric-label">TTFB</div>
-          <div class="metric-value">{formatMs(ttfb)}</div>
-          <div class="metric-description">Time to First Byte</div>
-        </div>
-        
-        <div class="metric-card neutral">
-          <div class="metric-label">Duration</div>
-          <div class="metric-value">{formatMs(totalDuration)}</div>
-          <div class="metric-description">Total Page Load Time</div>
-        </div>
       </div>
     </section>
     
@@ -116,6 +104,9 @@
         <h3>Navigation Timings</h3>
         <div class="total-duration">
           Total Duration: <strong>{formatMs(totalDuration)}</strong>
+        </div>
+        <div class="total-duration">
+          Time to first byte: <strong>{formatMs(ttfb)}</strong>
         </div>
         
         <div class="navigation-timings-bar">
