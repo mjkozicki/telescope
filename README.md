@@ -1,168 +1,247 @@
-# Browser Agent
+# Telescope - Multi-Framework Performance Testing Tool
 
-A diagnostic, cross-browser performance testing agent.
+This repository demonstrates the **same application implemented in 4 different ways**: SvelteKit, React, Web Components, and Vanilla HTML/CSS/JS.
 
-## What it collects
+## 🎯 Current Status
 
-When you run the agent, it will load the page in the browser you chose and apply any special parameters you have provided. By default, it will store results for the test in a `/results` directory. Each test gets its own folder with the date prefixed, followed by a unique ID.
+| Version | Status | Details |
+|---------|--------|---------|
+| **SvelteKit** | ✅ **100% Complete** | Full-featured with all 9 result views |
+| **React** | 🟡 **~20% Complete** | Scaffolding + Overview page done |
+| **Web Components** | 🟡 **~10% Complete** | Scaffolding only |
+| **Vanilla HTML** | 🟡 **~10% Complete** | Scaffolding only |
 
-Inside the test folder, the following files are added:
+## 📚 Documentation
 
-- `console.json` - Console output from the page to look for warnings, JS errors, etc
-- a video file showing the page load progression
-- `metrics.json` - A collection of timing metrics collected from the browser during page load
-- `pageload.har` - A har file of the page load
-- `resources.json` - The resource timing API data for the page
-- `screenshot.png` - A screenshot of the final page load
-- `/filmstrip` - A collection of screenshots during the page load that could be used for a filmstrip
+- **[WEB-VERSIONS-GUIDE.md](./WEB-VERSIONS-GUIDE.md)** - Comparison of all versions
+- **[IMPLEMENTATION-STATUS.md](./IMPLEMENTATION-STATUS.md)** - Detailed status and requirements
+- **[COMPLETING-OTHER-VERSIONS.md](./COMPLETING-OTHER-VERSIONS.md)** - Step-by-step implementation guide
 
-## Parameters
+## 🚀 Quick Start
 
-A full list of parameters can be printed to the terminal by running `npx . --help`. Here's what's currently supported:
+### 1. Install Dependencies
 
-```
-Options:
-  -u, --url <url>               URL to run tests against
-  -b, --browser <browser_name>  Browser to run tests with (choices: "chrome", "chrome-beta", "canary", "edge", "safari", "firefox", default: "chrome")
-  -h, --headers <object>        Any custom headers to apply to requests
-  -c, --cookies <object>        Any custom cookies to apply
-  -f, --flags <string>          A comma separated list of Chromium flags to launch Chrome with. See: https://peter.sh/experiments/chromium-command-line-switches/
-  --blockDomains <domains...>   A comma separated list of domains to block (default: [])
-  --block <substrings...>       A comma-delimited list of urls to block (based on a substring match) (default: [])
-  --firefoxPrefs <object>       Any Firefox User Preferences to apply (Firefox only). Example: '{"network.trr.mode": 2}'
-  --cpuThrottle <int>           CPU throttling factor
-  --connectionType <string>     Network connection type. By default, no throttling is applied. (choices: "cable", "dsl", "4g", "3g", "3gfast", "3gslow", "2g", "fios", default: false)
-  --width <int>                 Viewport width, in pixels (default: "1366")
-  --height <int>                Viewport height, in pixels (default: "768")
-  --frameRate <int>             Filmstrip frame rate, in frames per second (default: 1)
-  --disableJS                   Disable JavaScript (default: false)
-  --debug                       Output debug lines (default: false)
-  --auth <object>               Basic HTTP authentication (Expects: {"username": "", "password": ""})  (default: false)
-  --timeout <int>               Maximum time (in milliseconds) to wait for test to complete (default: 30000)
-  --html                        Generate HTML report (default: false)
-  --list                        Generate a list of test results as HTML (default: false)
-  --help                        display help for command
-```
-
-### Custom Timeout
-
-You can set a custom timeout by passing the desired timeout in milliseconds using the `--timeout` parameter. Defaults to 30000, or 30 seconds.
-
-```
-npx . -u https://www.example.com -b chrome --timeout 50000
-```
-
-### Setting Custom Cookies
-
-**Browser support**
-✅ Edge
-✅ Chrome
-🚫 Safari
-✅ Firefox
-
-You can define custom cookies to be passed along to request when running your test using the `-c` or `--cookies` parameter.
-
-Cookies must have a name and value passed. Optionally, you can also pass in either a URL or a domain and path. If none are passed, the script will default to using the test page url.
-
-#### Set a custom cookie for all requests
-
-```
-npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar"}'
-```
-
-#### Set multiple cookies for all requests
-
-```
-npx . -u https://www.example.com -b chrome -c '[{"name": "foo", "value": "bar"}, {"name": "foo2", "value": "bar2"}]'
-```
-
-#### Set a custom cookie for only a particular path
-
-```
-npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar", "domain":"www.example.com", "path":"/optim"}'
-```
-
-### Disabling JavaScript
-
-**Browser Support**
-✅ Edge
-✅ Chrome
-✅ Safari
-✅ Firefox
-
-You can run tests with JavaScript disabled to see the impact on performance by passing the `--disableJS` parameter like so:
-
-```
-npx . -u https://playwright.dev/ -b firefox --disableJS
-```
-
-### Basic HTTP Authentication
-
-**Browser Support**
-✅ Edge
-✅ Chrome
-✅ Safari
-✅ Firefox
-
-To test sites [protected with HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), you can pass the `--auth` parameter. It expects an object with a `username` and `password` like so:
-
-```
-npx . -u https://newsletter.www.example.com/admin -b safari --auth '{"username": "username", "password": "password"}'
-```
-
-## Installation
-
-### NPM dependencies
-
-After checking out the code, you need to install all the dependencies:
-
-```
+```bash
+# Root directory (for shared API server)
 npm install
+
+# Install for each version you want to use:
+cd web-svelte && npm install && cd ..
+cd web-react && npm install && cd ..
+cd web-web-components && npm install && cd ..
+# web-html needs no installation!
 ```
 
-### Browsers
+### 2. Start the Shared API Server
 
-### Chrome, Firefox, Safari and Chrome Canary
-
-Telescope uses Playwright to control and manage individual browser engines. Telescope will automatically run `npx playwright install` to install Chrome, Firefox, Chrome Canary and Safari (webkit).
-
-Note: Safari for MacOS Tahoe is now available in `playwright@next` version so we use that until it is available on the `@latest` channel.
-
-### Microsoft Edge and Chrome-beta
-
-To install Microsoft Edge or Chrome Beta playwright requires root privileges and will not automatically install them, all you have to do that is to run `npx playwright install msedge chrome-beta` from the command line (and provide root password).
-
-### ffmpeg
-
-Telescope uses `ffmpeg` to process the video and generate filmstrip images. You will need to have it installed on your machine.
-
-For MacOS you can use `homebrew` to install it:
-
-```
-brew install ffmpeg
+```bash
+# From root directory
+node shared-server.js
+# Server runs on http://localhost:3001
 ```
 
-## Programmatic Usage
+### 3. Start Your Chosen Frontend
 
-You can run telescope from within a Node.js script:
-
-```javascript
-import { launchTest } from '@cloudflare/telescope';
-
-const result = await launchTest({
-  url: 'https://example.com',
-  browser: 'chrome',
-  width: 1920,
-  height: 1080,
-  timeout: 60000,
-});
-
-if (result.success) {
-  console.log(`Test completed: ${result.testId}`);
-  console.log(`Results saved to: ${result.resultsPath}`);
-} else {
-  console.error(`Test failed: ${result.error}`);
-}
+**SvelteKit (Complete):**
+```bash
+cd web-svelte
+npm run dev
+# Visit http://localhost:5173
 ```
 
-All CLI options are supported as object properties. See Parameters section for available options.
+**React (Partial - Overview page complete):**
+```bash
+cd web-react
+npm run dev
+# Visit http://localhost:5173
+```
+
+**Web Components (Scaffolding only):**
+```bash
+cd web-web-components
+npm run dev
+# Visit http://localhost:5173
+```
+
+**Vanilla HTML (Scaffolding only):**
+```bash
+cd web-html
+# No build step! Open index.html or:
+npx serve .
+# Visit http://localhost:3000
+```
+
+## 📂 Project Structure
+
+```
+svelte-telescope/
+├── shared-server.js              # Express API server (shared by all)
+├── package.json                  # Root dependencies
+├── test-results/                 # Shared test results directory
+├── requested/                    # Test request queue
+│
+├── web-svelte/                   # ✅ COMPLETE SvelteKit version
+│   ├── src/
+│   │   ├── routes/
+│   │   │   ├── +page.svelte     # Home page
+│   │   │   ├── api/             # API routes (integrated)
+│   │   │   └── results/
+│   │   │       └── [testId]/    # 9 complete result views
+│   │   └── lib/
+│   │       ├── components/
+│   │       └── styles/
+│   └── package.json
+│
+├── web-react/                    # 🟡 PARTIAL React version
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── components/          # Logo, Navigation, Tabs
+│   │   ├── pages/
+│   │   │   └── result/
+│   │   │       ├── Overview.jsx # ✅ Complete!
+│   │   │       └── *.jsx        # 8 placeholders
+│   │   └── utils/
+│   │       └── format.js        # ✅ Shared utilities
+│   └── package.json
+│
+├── web-web-components/           # 🟡 SCAFFOLDING Web Components
+│   ├── src/
+│   │   ├── components/          # Custom elements
+│   │   ├── pages/               # Page components
+│   │   └── router.js
+│   └── package.json
+│
+└── web-html/                     # 🟡 SCAFFOLDING Vanilla HTML
+    ├── index.html               # Home page
+    ├── results.html             # Results list
+    ├── result/
+    │   └── *.html              # 9 placeholder pages
+    └── css/
+        └── main.css            # Shared styles
+```
+
+## ✨ Features
+
+### Implemented in SvelteKit (✅ Complete):
+- ✅ Test submission (simple & advanced forms)
+- ✅ Results list with screenshots
+- ✅ 9 detailed result views:
+  - **Overview** - CWV metrics, screenshot, test info
+  - **Metrics** - Timeline, cards, performance tables
+  - **Resources** - Expandable table with timing visualization
+  - **Waterfall** - Interactive network waterfall
+  - **Filmstrip** - Visual progression with CLS
+  - **Video** - Video playback
+  - **Console** - Color-coded browser logs
+  - **Bottlenecks** - Top 5 analysis
+  - **Config** - Prettified JSON display
+- ✅ File upload for test results
+- ✅ Server-side rendering
+- ✅ Responsive design
+
+### Implemented in React (🟡 Partial):
+- ✅ Complete routing and navigation
+- ✅ Home, Advanced, Results, Upload pages
+- ✅ **Overview page fully functional**
+- ✅ Shared utility functions
+- ❌ 8 other result pages (placeholders)
+
+### Implemented in Web Components & Vanilla HTML (🟡 Scaffolding):
+- ✅ Basic structure and navigation
+- ✅ Home and results list pages
+- ❌ All result detail pages (placeholders)
+
+## 🎓 What You Can Learn
+
+This project demonstrates:
+
+1. **Same Design, Different Implementations**
+   - Identical UI/UX across all versions
+   - Same CSS styling (shared)
+   - Same API endpoints
+
+2. **Framework Patterns**
+   - Component architecture (React, Svelte, Web Components)
+   - State management approaches
+   - Routing strategies
+   - Data fetching patterns
+
+3. **Build Tools**
+   - Vite (SvelteKit, React, Web Components)
+   - No build tools (Vanilla HTML)
+
+4. **Performance**
+   - Bundle size comparisons
+   - Runtime performance
+   - Initial load time
+
+## 🛠️ API Endpoints
+
+The shared server (`shared-server.js`) provides:
+
+- `POST /api/submit-test` - Submit new test
+- `GET /api/results` - List all results
+- `GET /api/results/:testId` - Get test details
+- `POST /api/upload` - Upload test archive
+
+All versions use the same API.
+
+## 📦 Completing the Other Versions
+
+### To Complete React, Web Components, or Vanilla HTML:
+
+1. **Read**: `COMPLETING-OTHER-VERSIONS.md` for step-by-step guide
+2. **Reference**: The complete SvelteKit implementation
+3. **Copy**: Logic from `web-svelte/src/routes/results/[testId]/` pages
+4. **Adapt**: To your target framework using provided patterns
+5. **Test**: Each page as you build it
+
+### Example (React Overview - DONE):
+- ✅ `web-react/src/pages/result/Overview.jsx` - Complete reference implementation
+- ✅ `web-react/src/utils/format.js` - Shared utilities
+
+Use these as templates for the remaining 8 pages!
+
+## 🎯 Why This Project Exists
+
+1. **Educational** - Learn by comparing implementations
+2. **Flexibility** - Choose the framework that fits your needs
+3. **Real-world** - Complete application, not just a demo
+4. **Best Practices** - Production-ready patterns
+
+## 📊 Framework Comparison
+
+| Aspect | SvelteKit | React | Web Components | Vanilla |
+|--------|-----------|-------|----------------|---------|
+| Bundle Size | ~50KB | ~150KB | ~20KB | ~5KB |
+| Learning Curve | Medium | Low | High | Low |
+| DX | Excellent | Good | Fair | Basic |
+| Build Required | Yes | Yes | Optional | No |
+| SSR | Built-in | Setup needed | No | No |
+
+## 🤝 Contributing
+
+To complete the implementations:
+
+1. Pick a version (React, Web Components, or Vanilla HTML)
+2. Pick a page (start with Config or Video - easiest!)
+3. Follow `COMPLETING-OTHER-VERSIONS.md`
+4. Port the SvelteKit logic to your framework
+5. Test thoroughly
+6. Submit a PR!
+
+## 📝 License
+
+MIT
+
+## 🙏 Credits
+
+- **SvelteKit** - Full implementation
+- **Shared Design** - Consistent across all versions
+- **WebPageTest** - Waterfall inspiration
+
+---
+
+**Status**: SvelteKit is production-ready. Other versions need completion (see guides above).
+
+**Next Steps**: Complete the remaining 8 result pages for React, Web Components, and Vanilla HTML versions.

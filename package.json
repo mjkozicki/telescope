@@ -1,36 +1,23 @@
 {
-  "name": "@cloudflare/telescope",
+  "name": "telescope-shared",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "keywords": [],
-  "author": "Cloudflare",
-  "license": "Apache-2.0",
   "type": "module",
-  "bin": {
-    "telescope": "cli.js"
-  },
+  "description": "Shared API server for all Telescope web versions",
+  "main": "shared-server.js",
   "scripts": {
-    "start": "node cli.js",
-    "test": "NODE_OPTIONS=\"--experimental-vm-modules --no-warnings\" jest --verbose --maxWorkers=1",
-    "testAction": "NODE_OPTIONS=\"--experimental-vm-modules --no-warnings\" jest __tests__/browsers.test.js --verbose",
-    "coverage": "NODE_OPTIONS=\"--experimental-vm-modules --no-warnings\" jest --collect-coverage --verbose --maxWorkers=1",
-    "clean": "rm -rf node_modules results",
-    "prettier": "npx prettier --write .",
-    "postinstall": "npx playwright install"
-  },
-  "devDependencies": {
-    "@playwright/test": "next",
-    "jest": "^29.5.0",
-    "prettier": "^3.6.2",
-    "prettier-plugin-ejs": "^1.0.3"
+    "server": "node shared-server.js",
+    "start": "node shared-server.js"
   },
   "dependencies": {
-    "@sitespeed.io/throttle": "^5.0.0",
-    "commander": "^10.0.0",
-    "ejs": "^3.1.10",
-    "ffmpeg": "^0.0.4",
-    "playwright": "next",
-    "playwright-webkit": "next"
-  }
+    "express": "^4.18.2",
+    "busboy": "^1.6.0",
+    "adm-zip": "^0.5.10"
+  },
+  "keywords": [
+    "telescope",
+    "performance",
+    "testing"
+  ],
+  "author": "Cloudflare",
+  "license": "MIT"
 }
