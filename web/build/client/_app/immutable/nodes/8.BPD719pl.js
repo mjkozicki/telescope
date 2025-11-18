@@ -1,0 +1,1 @@
+import{f as t,a as e}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var n=t('<div class="section-content"><h2>Config</h2> <p>Test configuration and settings.</p> <p class="placeholder svelte-zsn3ck">Configuration data will be displayed here.</p></div>');function p(o){var a=n();e(o,a)}export{p as component};

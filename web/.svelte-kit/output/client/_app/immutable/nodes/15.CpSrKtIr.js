@@ -1,0 +1,1 @@
+import{f as t,a as r}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var l=t('<div class="section-content"><h2>Waterfall</h2> <p>Network request waterfall chart.</p> <p class="placeholder svelte-f6l2ae">Waterfall chart will be displayed here.</p></div>');function s(a){var e=l();r(a,e)}export{s as component};

@@ -2,10 +2,6 @@
   import type { PageData } from './$types';
   
   export let data: PageData;
-  
-  // Sample test ID from public folder if available
-  const sampleTestId = '2025_11_11_21_24_52_0a417b48';
-  
   function formatTimestamp(timestamp: string): string {
     try {
       const date = new Date(timestamp);
@@ -23,20 +19,18 @@
   {#if data.results.length === 0}
     <div class="empty-state">
       <p>No test results yet. Run a test to see results here.</p>
-      <p class="sample-link">
-        Or view the <a href="/results/{sampleTestId}/overview">sample test result</a> 
-        (if available in public/results folder)
-      </p>
     </div>
   {:else}
     <ul class="results-list">
       {#each data.results as result}
         <li class="result-item">
-          <a href="/results/{result.id}/overview" class="result-link">
+          <a href="/results/{result.testId}/overview" class="result-link">
+            <img src="{result.screenshotUrl || '/images/default-screenshot.png'}" alt="Screenshot" class="result-screenshot" />
             <div class="result-main">
               <strong class="result-url">{result.url}</strong>
-              <div class="result-meta">
-                <span class="result-browser">{result.browser}</span>
+                <div class="result-meta">
+                  <img src="{result.engineUrl}" alt="Engine" class="result-engine" />
+                  <span class="result-browser">{result.browser}</span>
                 <span class="result-time">{formatTimestamp(result.timestamp)}</span>
               </div>
             </div>
@@ -106,6 +100,15 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
+  .result-screenshot {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border-lighter);
+    flex-shrink: 0;
+  }
+
   .result-main {
     flex: 1;
     min-width: 0;
@@ -117,6 +120,7 @@
     color: var(--color-primary);
     margin-bottom: var(--spacing-xs);
     word-break: break-all;
+    border-radius: var(--border-radius-sm);
   }
 
   .result-meta {
@@ -124,6 +128,13 @@
     gap: var(--spacing-md);
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+    align-items: center;
+  }
+
+  .result-engine {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
   }
 
   .result-arrow {
@@ -140,6 +151,11 @@
   @media (max-width: 768px) {
     .result-link {
       padding: var(--spacing-md);
+    }
+
+    .result-screenshot {
+      width: 80px;
+      height: 60px;
     }
 
     .result-meta {

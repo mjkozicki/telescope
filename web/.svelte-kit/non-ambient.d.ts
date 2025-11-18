@@ -27,7 +27,7 @@ export {};
 
 declare module "$app/types" {
 	export interface AppTypes {
-		RouteId(): "/" | "/advanced" | "/results" | "/results/[testId]" | "/results/[testId]/bottlenecks" | "/results/[testId]/config" | "/results/[testId]/console" | "/results/[testId]/filmstrip" | "/results/[testId]/metrics" | "/results/[testId]/overview" | "/results/[testId]/resources" | "/results/[testId]/video" | "/results/[testId]/waterfall" | "/upload";
+		RouteId(): "/" | "/advanced" | "/api" | "/api/results" | "/api/submit-test" | "/api/upload" | "/results" | "/results/[testId]" | "/results/[testId]/bottlenecks" | "/results/[testId]/config" | "/results/[testId]/console" | "/results/[testId]/filmstrip" | "/results/[testId]/metrics" | "/results/[testId]/overview" | "/results/[testId]/resources" | "/results/[testId]/video" | "/results/[testId]/waterfall" | "/upload";
 		RouteParams(): {
 			"/results/[testId]": { testId: string };
 			"/results/[testId]/bottlenecks": { testId: string };
@@ -43,6 +43,10 @@ declare module "$app/types" {
 		LayoutParams(): {
 			"/": { testId?: string };
 			"/advanced": Record<string, never>;
+			"/api": Record<string, never>;
+			"/api/results": Record<string, never>;
+			"/api/submit-test": Record<string, never>;
+			"/api/upload": Record<string, never>;
 			"/results": { testId?: string };
 			"/results/[testId]": { testId: string };
 			"/results/[testId]/bottlenecks": { testId: string };
@@ -56,8 +60,8 @@ declare module "$app/types" {
 			"/results/[testId]/waterfall": { testId: string };
 			"/upload": Record<string, never>
 		};
-		Pathname(): "/" | "/advanced" | "/advanced/" | "/results" | "/results/" | `/results/${string}` & {} | `/results/${string}/` & {} | `/results/${string}/bottlenecks` & {} | `/results/${string}/bottlenecks/` & {} | `/results/${string}/config` & {} | `/results/${string}/config/` & {} | `/results/${string}/console` & {} | `/results/${string}/console/` & {} | `/results/${string}/filmstrip` & {} | `/results/${string}/filmstrip/` & {} | `/results/${string}/metrics` & {} | `/results/${string}/metrics/` & {} | `/results/${string}/overview` & {} | `/results/${string}/overview/` & {} | `/results/${string}/resources` & {} | `/results/${string}/resources/` & {} | `/results/${string}/video` & {} | `/results/${string}/video/` & {} | `/results/${string}/waterfall` & {} | `/results/${string}/waterfall/` & {} | "/upload" | "/upload/";
+		Pathname(): "/" | "/advanced" | "/advanced/" | "/api" | "/api/" | "/api/results" | "/api/results/" | "/api/submit-test" | "/api/submit-test/" | "/api/upload" | "/api/upload/" | "/results" | "/results/" | `/results/${string}` & {} | `/results/${string}/` & {} | `/results/${string}/bottlenecks` & {} | `/results/${string}/bottlenecks/` & {} | `/results/${string}/config` & {} | `/results/${string}/config/` & {} | `/results/${string}/console` & {} | `/results/${string}/console/` & {} | `/results/${string}/filmstrip` & {} | `/results/${string}/filmstrip/` & {} | `/results/${string}/metrics` & {} | `/results/${string}/metrics/` & {} | `/results/${string}/overview` & {} | `/results/${string}/overview/` & {} | `/results/${string}/resources` & {} | `/results/${string}/resources/` & {} | `/results/${string}/video` & {} | `/results/${string}/video/` & {} | `/results/${string}/waterfall` & {} | `/results/${string}/waterfall/` & {} | "/upload" | "/upload/";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
-		Asset(): string & {};
+		Asset(): "/.DS_Store" | "/vite.svg" | string & {};
 	}
 }

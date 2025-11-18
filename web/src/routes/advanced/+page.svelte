@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
+  
   // Basic options
   let url = '';
   let browser = 'chrome';
@@ -26,34 +28,69 @@
   let timeout = 30000;
   let generateHtml = false;
   let debug = false;
+  
+  let submitting = false;
+  let error = '';
 
-  function handleSubmit(event: Event) {
+  async function handleSubmit(event: Event) {
     event.preventDefault();
     
-    // Build configuration object
-    const config = {
-      url,
-      browser,
-      ...(connectionType && { connectionType }),
-      ...(cpuThrottle && { cpuThrottle }),
-      width,
-      height,
-      ...(blockDomains && { blockDomains: blockDomains.split(',').map(d => d.trim()) }),
-      ...(blockUrls && { block: blockUrls.split(',').map(u => u.trim()) }),
-      disableJS,
-      ...(headers && { headers: JSON.parse(headers) }),
-      ...(cookies && { cookies: JSON.parse(cookies) }),
-      ...(flags && { flags }),
-      ...(firefoxPrefs && { firefoxPrefs: JSON.parse(firefoxPrefs) }),
-      ...(auth.username && auth.password && { auth }),
-      frameRate,
-      timeout,
-      html: generateHtml,
-      debug
-    };
+    if (!url) {
+      error = 'Please enter a URL';
+      return;
+    }
     
-    console.log('Running advanced test with config:', config);
-    // TODO: Implement test runner
+    submitting = true;
+    error = '';
+    
+    try {
+      // Build configuration object
+      const config = {
+        url,
+        browser,
+        ...(connectionType && { connectionType }),
+        ...(cpuThrottle && { cpuThrottle }),
+        width,
+        height,
+        ...(blockDomains && { blockDomains: blockDomains.split(',').map(d => d.trim()) }),
+        ...(blockUrls && { block: blockUrls.split(',').map(u => u.trim()) }),
+        disableJS,
+        ...(headers && { headers: JSON.parse(headers) }),
+        ...(cookies && { cookies: JSON.parse(cookies) }),
+        ...(flags && { flags }),
+        ...(firefoxPrefs && { firefoxPrefs: JSON.parse(firefoxPrefs) }),
+        ...(auth.username && auth.password && { auth }),
+        frameRate,
+        timeout,
+        html: generateHtml,
+        debug
+      };
+      
+      const response = await fetch('/api/submit-test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config)
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        if (data.redirectUrl) {
+          goto(data.redirectUrl);
+        } else if (data.testId) {
+          goto(`/results/${data.testId}/overview`);
+        }
+      } else {
+        error = data.error || 'Failed to submit test';
+      }
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Network error. Please try again.';
+      console.error('Test submission error:', err);
+    } finally {
+      submitting = false;
+    }
   }
 </script>
 
@@ -62,6 +99,10 @@
   <p>Configure advanced testing options with full control over browser behavior, network conditions, and more.</p>
   
   <form on:submit={handleSubmit}>
+    {#if error}
+      <div class="error-message">{error}</div>
+    {/if}
+    
     <!-- Basic Configuration -->
     <section class="form-section">
       <h3>Basic Configuration</h3>
@@ -310,7 +351,9 @@
       </div>
     </section>
     
-    <button type="submit" class="submit-button">Run Advanced Test</button>
+    <button type="submit" class="submit-button" disabled={submitting}>
+      {submitting ? 'Submitting...' : 'Run Advanced Test'}
+    </button>
   </form>
 </div>
 
@@ -321,6 +364,15 @@
 
   form {
     margin-top: var(--spacing-xl);
+  }
+
+  .error-message {
+    padding: var(--spacing-md);
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: var(--border-radius-md);
+    color: #c33;
+    margin-bottom: var(--spacing-lg);
   }
 
   .form-section {
@@ -447,14 +499,19 @@
     margin-top: var(--spacing-xl);
   }
 
-  .submit-button:hover {
+  .submit-button:hover:not(:disabled) {
     background: var(--color-accent-dark);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px #ff6b354d;
   }
 
-  .submit-button:active {
+  .submit-button:active:not(:disabled) {
     transform: translateY(0);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   @media (max-width: 768px) {

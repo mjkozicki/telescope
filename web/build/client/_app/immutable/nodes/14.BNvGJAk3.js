@@ -1,0 +1,1 @@
+import{f as p,a}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var d=p('<div class="section-content"><h2>Video</h2> <p>Recorded video of the page load.</p> <p class="placeholder svelte-1fr5qzp">Video player will be displayed here.</p></div>');function t(e){var o=d();a(e,o)}export{t as component};

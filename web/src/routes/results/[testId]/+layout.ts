@@ -9,9 +9,9 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
     // In production, this would fetch from your data source
     // For now, we'll load from static public/results folder if it exists
     
-    const manifestResponse = await fetch(`/results/${testId}/manifest.json`);
-    const configResponse = await fetch(`/results/${testId}/config.json`);
-    const metricsResponse = await fetch(`/results/${testId}/metrics.json`);
+    const manifestResponse = await fetch(`/test-results/${testId}/manifest.json`);
+    const configResponse = await fetch(`/test-results/${testId}/config.json`);
+    const metricsResponse = await fetch(`/test-results/${testId}/metrics.json`);
     
     const manifest = manifestResponse.ok ? await manifestResponse.json() : null;
     const config = configResponse.ok ? await configResponse.json() : null;

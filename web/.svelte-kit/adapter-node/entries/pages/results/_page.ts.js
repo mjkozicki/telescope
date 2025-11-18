@@ -1,0 +1,21 @@
+const load = async ({ fetch }) => {
+  try {
+    const response = await fetch("/api/results");
+    if (!response.ok) {
+      console.error("Failed to load results:", response.statusText);
+      return { results: [] };
+    }
+    const results = await response.json();
+    return {
+      results
+    };
+  } catch (err) {
+    console.error("Error loading results:", err);
+    return {
+      results: []
+    };
+  }
+};
+export {
+  load
+};

@@ -1,0 +1,1 @@
+import{f as o,a as s}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var r=o('<div class="section-content"><h2>Resources</h2> <p>Resource loading breakdown and analysis.</p> <p class="placeholder svelte-1asmbwv">Resource data will be displayed here.</p></div>');function t(e){var a=r();s(e,a)}export{t as component};

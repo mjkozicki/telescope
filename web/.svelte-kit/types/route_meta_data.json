@@ -1,6 +1,15 @@
 {
 	"/": [],
 	"/advanced": [],
+	"/api/results": [
+		"src/routes/api/results/+server.ts"
+	],
+	"/api/submit-test": [
+		"src/routes/api/submit-test/+server.ts"
+	],
+	"/api/upload": [
+		"src/routes/api/upload/+server.ts"
+	],
 	"/results": [
 		"src/routes/results/+page.ts"
 	],

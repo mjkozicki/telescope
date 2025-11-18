@@ -1,0 +1,1 @@
+import{f as p,a}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var i=p('<div class="section-content"><h2>Filmstrip</h2> <p>Visual progress filmstrip showing page load.</p> <p class="placeholder svelte-ea9ysk">Filmstrip frames will be displayed here.</p></div>');function l(s){var e=i();a(s,e)}export{l as component};

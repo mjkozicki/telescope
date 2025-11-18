@@ -1,0 +1,1 @@
+import{f as r,a as t}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var o=r('<div class="section-content"><h2>Metrics</h2> <p>Performance metrics and Core Web Vitals.</p> <p class="placeholder svelte-1875gmj">Metrics data will be displayed here.</p></div>');function p(e){var a=o();t(e,a)}export{p as component};

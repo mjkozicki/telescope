@@ -1,0 +1,1 @@
+import{f as s,a}from"../chunks/B2htzuoC.js";import"../chunks/vVpGJ83M.js";var l=s('<div class="section-content"><h2>Console</h2> <p>Browser console logs and messages.</p> <p class="placeholder svelte-aeijgv">Console logs will be displayed here.</p></div>');function r(o){var e=l();a(o,e)}export{r as component};

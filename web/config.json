@@ -1,0 +1,6 @@
+{
+  "agentUrl": "http://localhost:3001/agent",
+  "resultsDir": "./static/test-results",
+  "requestedDir": "./static/requested"
+}
+
