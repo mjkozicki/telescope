@@ -1,40 +1,23 @@
 {
-  "name": "real-telescope-ui",
-  "version": "1.0.0",
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vite dev",
+    "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --ext ts,tsx --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\"",
-    "type-check": "tsc --noEmit",
-    "generate-manifest": "tsx scripts/generate-manifest.ts",
-    "generate-manifest:all": "tsx scripts/generate-manifest.ts --all"
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.app.json"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.5.7",
-    "@types/busboy": "^1.5.4",
-    "@types/node": "^24.10.1",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
-    "@vitest/coverage-v8": "^2.1.5",
-    "@vitest/ui": "^2.1.5",
-    "adm-zip": "^0.5.16",
-    "busboy": "^1.6.0",
-    "eslint": "^9.14.0",
-    "jsdom": "^25.0.1",
-    "prettier": "^3.3.3",
-    "tsx": "^4.20.6",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.10",
-    "vitest": "^2.1.5"
-  },
-  "dependencies": {
-    "express": "^5.1.0"
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.48.5",
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tsconfig/svelte": "^5.0.5",
+    "@types/node": "^24.10.0",
+    "svelte": "^5.43.5",
+    "svelte-check": "^4.3.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.2"
   }
 }

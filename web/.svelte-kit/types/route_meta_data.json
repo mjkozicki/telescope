@@ -1,0 +1,40 @@
+{
+	"/": [],
+	"/advanced": [],
+	"/results": [
+		"src/routes/results/+page.ts"
+	],
+	"/results/[testId]": [
+		"src/routes/results/[testId]/+page.ts",
+		"src/routes/results/[testId]/+layout.ts",
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/bottlenecks": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/config": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/console": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/filmstrip": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/metrics": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/overview": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/resources": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/video": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/results/[testId]/waterfall": [
+		"src/routes/results/[testId]/+layout.ts"
+	],
+	"/upload": []
+}

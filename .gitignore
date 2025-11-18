@@ -46,7 +46,7 @@ tmp/
 *.temp
 
 # Results (keep public directory but exclude results within it)
-results/
+/results/*
 **/public/results/
 **/public/requested/
 
