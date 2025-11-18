@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Overview - Telescope</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <div id="root">
+    <div class="app">
+      <div class="logo-container">
+        <img src="/assets/vite.svg" alt="Logo" class="logo" />
+      </div>
+
+      <nav class="common-nav" id="result-nav"></nav>
+
+      <header>
+        <div class="tabs">
+          <a href="/" class="tab">Simple</a>
+          <a href="/advanced.html" class="tab">Advanced</a>
+          <a href="/results.html" class="tab active">Results</a>
+          <a href="/upload.html" class="tab">Upload</a>
+        </div>
+      </header>
+
+      <main>
+        <div class="content">
+          <div class="section-content">
+            <h2>Overview</h2>
+            <div id="content">Loading...</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get('testId');
+
+    // Update navigation
+    const nav = document.getElementById('result-nav');
+    const pages = ['overview', 'metrics', 'resources', 'waterfall', 'filmstrip', 'video', 'console', 'bottlenecks', 'config'];
+    nav.innerHTML = pages.map(page => `
+      <a href="/result/${page}.html?testId=${testId}" class="nav-link ${page === 'overview' ? 'active' : ''}">
+        ${page.charAt(0).toUpperCase() + page.slice(1)}
+      </a>
+    `).join('');
+
+    // Load test data
+    const content = document.getElementById('content');
+    async function loadData() {
+      try {
+        const response = await fetch(`/api/results/${testId}`);
+        const data = await response.json();
+        content.innerHTML = `
+          <p>Test summary with key performance metrics and screenshot.</p>
+          <div style="margin-top: 2rem;">
+            <strong>Test ID:</strong> ${testId}<br>
+            <strong>URL:</strong> ${data.config?.url || 'N/A'}
+          </div>
+        `;
+      } catch (err) {
+        content.innerHTML = '<p>Failed to load test data</p>';
+      }
+    }
+    
+    if (testId) {
+      loadData();
+    } else {
+      content.innerHTML = '<p>No test ID provided</p>';
+    }
+  </script>
+</body>
+</html>
+
