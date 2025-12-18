@@ -4,7 +4,7 @@ A diagnostic, cross-browser performance testing agent.
 
 ## What it collects
 
-When you run the agent, it will load the page in the browser you chose and apply any special parameters you have provided. By default, it will store results for the test in a `/results` directory. Each test gets its own folder with the date prefixed, followed by a unique ID.
+When you run the agent, it will load the page in the browser you chose and apply any special parameters you have provided. By default, it will store results for the test in a `results` directory (relative to the `agent` directory). Each test gets its own folder with the date prefixed, followed by a unique ID.
 
 Inside the test folder, the following files are added:
 
@@ -18,7 +18,7 @@ Inside the test folder, the following files are added:
 
 ## Parameters
 
-A full list of parameters can be printed to the terminal by running `npx . --help`. Here's what's currently supported:
+A full list of parameters can be printed to the terminal by running `npx . --help` from the `agent` directory. Here's what's currently supported:
 
 ```
 Options:
@@ -51,6 +51,7 @@ Options:
 You can set a custom timeout by passing the desired timeout in milliseconds using the `--timeout` parameter. Defaults to 30000, or 30 seconds.
 
 ```
+cd agent
 npx . -u https://www.example.com -b chrome --timeout 50000
 ```
 
@@ -67,12 +68,14 @@ You can generate an HTML report of your test results by passing the `--html` par
 #### Generate HTML report
 
 ```
+cd agent
 npx . -u https://example.com -b chrome --html
 ```
 
 #### Generate and automatically open HTML report
 
 ```
+cd agent
 npx . -u https://example.com -b chrome --html --openHtml
 ```
 
@@ -91,18 +94,21 @@ Cookies must have a name and value passed. Optionally, you can also pass in eith
 #### Set a custom cookie for all requests
 
 ```
+cd agent
 npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar"}'
 ```
 
 #### Set multiple cookies for all requests
 
 ```
+cd agent
 npx . -u https://www.example.com -b chrome -c '[{"name": "foo", "value": "bar"}, {"name": "foo2", "value": "bar2"}]'
 ```
 
 #### Set a custom cookie for only a particular path
 
 ```
+cd agent
 npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar", "domain":"www.example.com", "path":"/optim"}'
 ```
 
@@ -117,6 +123,7 @@ npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar", "
 You can run tests with JavaScript disabled to see the impact on performance by passing the `--disableJS` parameter like so:
 
 ```
+cd agent
 npx . -u https://playwright.dev/ -b firefox --disableJS
 ```
 
@@ -131,6 +138,7 @@ npx . -u https://playwright.dev/ -b firefox --disableJS
 To test sites [protected with HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), you can pass the `--auth` parameter. It expects an object with a `username` and `password` like so:
 
 ```
+cd agent
 npx . -u https://newsletter.www.example.com/admin -b safari --auth '{"username": "username", "password": "password"}'
 ```
 
@@ -138,9 +146,10 @@ npx . -u https://newsletter.www.example.com/admin -b safari --auth '{"username":
 
 ### NPM dependencies
 
-After checking out the code, you need to install all the dependencies:
+After checking out the code, navigate to the `agent` directory and install all the dependencies:
 
 ```
+cd agent
 npm install
 ```
 
@@ -154,7 +163,7 @@ Note: Safari for MacOS Tahoe is now available in `playwright@next` version so we
 
 ### Microsoft Edge and Chrome-beta
 
-To install Microsoft Edge or Chrome Beta playwright requires root privileges and will not automatically install them, all you have to do that is to run `npx playwright install msedge chrome-beta` from the command line (and provide root password).
+To install Microsoft Edge or Chrome Beta playwright requires root privileges and will not automatically install them, all you have to do that is to run `npx playwright install msedge chrome-beta` from the `agent` directory (and provide root password).
 
 ### ffmpeg
 
@@ -168,10 +177,10 @@ brew install ffmpeg
 
 ## Programmatic Usage
 
-You can run telescope from within a Node.js script:
+You can run telescope from within a Node.js script. If using from the repository, import from the `agent` directory:
 
 ```javascript
-import { launchTest } from '@cloudflare/telescope';
+import { launchTest } from './agent/index.js';
 
 const result = await launchTest({
   url: 'https://example.com',
