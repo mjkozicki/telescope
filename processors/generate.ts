@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ejs from 'ejs';
 import { fileURLToPath } from 'url';
+import { drawCriticalPathChart } from './critical_path';
 
 interface HarEntry {
   request: {
@@ -595,6 +596,7 @@ function generateHtml(
   let harRequests: NetworkRequest[] | null = null;
   if (harFiles.length > 0) {
     harRequests = parseHarFile(path.join(basePath, harFiles[0]));
+    drawCriticalPathChart(harRequests, har.log);
   }
 
   let hasNetworkRequests = harRequests && harRequests.length > 0;
