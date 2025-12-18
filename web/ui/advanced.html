@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced - Browser Agent</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div class="sidebar">
+    <side-nav active="/advanced"></side-nav>
+  </div>
+  <div class="main-content">
+    <div class="container">
+    <h1>Advanced Test Configuration</h1>
+    <p class="subtitle">Configure all available options for comprehensive browser performance testing</p>
+    
+    <div id="message-container" class="form-section" style="display: none;">
+      <div class="error-message"></div>
+      <div class="success-message"></div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Basic Options</h2>
+      <div class="form-group">
+        <label for="url">URL *</label>
+        <input type="url" id="url" name="url" placeholder="https://example.com" required>
+        <div class="help-text">URL to run tests against</div>
+      </div>
+      <div class="form-group">
+        <label for="browser">Browser</label>
+        <select id="browser" name="browser">
+          <option value="chrome" selected>Chrome</option>
+          <option value="chrome-beta">Chrome Beta</option>
+          <option value="canary">Chrome Canary</option>
+          <option value="edge">Microsoft Edge</option>
+          <option value="safari">Safari</option>
+          <option value="firefox">Firefox</option>
+        </select>
+        <div class="help-text">Browser to use for testing (default: chrome)</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Request Options</h2>
+      <div class="form-group">
+        <label for="headers">Custom Headers (JSON)</label>
+        <textarea id="headers" name="headers" placeholder='{"Authorization": "Bearer token"}'></textarea>
+        <div class="help-text">Any custom headers to apply to requests (JSON object)</div>
+      </div>
+      <div class="form-group">
+        <label for="cookies">Custom Cookies (JSON)</label>
+        <textarea id="cookies" name="cookies" placeholder='{"name": "foo", "value": "bar"}'></textarea>
+        <div class="help-text">Custom cookies to apply. Can be object or array of objects</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="authUsername">HTTP Auth Username</label>
+          <input type="text" id="authUsername" name="authUsername" placeholder="username">
+        </div>
+        <div class="form-group">
+          <label for="authPassword">HTTP Auth Password</label>
+          <input type="password" id="authPassword" name="authPassword" placeholder="password">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Browser Configuration</h2>
+      <div class="form-group">
+        <label for="flags">Chromium Flags</label>
+        <input type="text" id="flags" name="flags" placeholder="--disable-gpu,--no-sandbox">
+        <div class="help-text">Comma-separated list of Chromium flags</div>
+      </div>
+      <div class="form-group">
+        <label for="firefoxPrefs">Firefox Preferences (JSON)</label>
+        <textarea id="firefoxPrefs" name="firefoxPrefs" placeholder='{"network.trr.mode": 2}'></textarea>
+        <div class="help-text">Firefox User Preferences (Firefox only)</div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="disableJS" name="disableJS">
+          <label for="disableJS">Disable JavaScript</label>
+        </div>
+        <div class="help-text">Run tests with JavaScript disabled</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Network Options</h2>
+      <div class="form-group">
+        <label for="blockDomains">Block Domains</label>
+        <input type="text" id="blockDomains" name="blockDomains" placeholder="ads.example.com, tracking.example.com">
+        <div class="help-text">Comma-separated list of domains to block</div>
+      </div>
+      <div class="form-group">
+        <label for="block">Block URLs</label>
+        <input type="text" id="block" name="block" placeholder="analytics, ads">
+        <div class="help-text">Comma-delimited list of URL substrings to block</div>
+      </div>
+      <div class="form-group">
+        <label for="connectionType">Connection Type</label>
+        <select id="connectionType" name="connectionType">
+          <option value="">None (default)</option>
+          <option value="cable">Cable</option>
+          <option value="dsl">DSL</option>
+          <option value="4g">4G</option>
+          <option value="3g">3G</option>
+          <option value="3gfast">3G Fast</option>
+          <option value="3gslow">3G Slow</option>
+          <option value="2g">2G</option>
+          <option value="fios">FiOS</option>
+        </select>
+        <div class="help-text">Network connection type for throttling</div>
+      </div>
+      <div class="form-group">
+        <label for="cpuThrottle">CPU Throttle Factor</label>
+        <input type="number" id="cpuThrottle" name="cpuThrottle" placeholder="4" min="1">
+        <div class="help-text">CPU throttling factor (1 = no throttling)</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Viewport Options</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="width">Width (px)</label>
+          <input type="number" id="width" name="width" value="1366" min="1">
+          <div class="help-text">Viewport width in pixels (default: 1366)</div>
+        </div>
+        <div class="form-group">
+          <label for="height">Height (px)</label>
+          <input type="number" id="height" name="height" value="768" min="1">
+          <div class="help-text">Viewport height in pixels (default: 768)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Recording Options</h2>
+      <div class="form-group">
+        <label for="frameRate">Filmstrip Frame Rate (fps)</label>
+        <input type="number" id="frameRate" name="frameRate" value="1" min="1">
+        <div class="help-text">Filmstrip frame rate in frames per second (default: 1)</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Test Options</h2>
+      <div class="form-group">
+        <label for="timeout">Timeout (ms)</label>
+        <input type="number" id="timeout" name="timeout" value="30000" min="1000">
+        <div class="help-text">Maximum time to wait for test completion in milliseconds (default: 30000)</div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="debug" name="debug">
+          <label for="debug">Debug Mode</label>
+        </div>
+        <div class="help-text">Output debug lines</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Output Options</h2>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="html" name="html">
+          <label for="html">Generate HTML Report</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="openHtml" name="openHtml">
+          <label for="openHtml">Open HTML Report Automatically</label>
+        </div>
+        <div class="help-text">Requires HTML report to be enabled</div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="list" name="list">
+          <label for="list">Generate Test Results List</label>
+        </div>
+        <div class="help-text">Generate a list of test results as HTML</div>
+      </div>
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="zip" name="zip">
+          <label for="zip">Zip Results</label>
+        </div>
+        <div class="help-text">Zip the test results into the results directory</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button id="run-button" class="run-button">Run Advanced Test</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const errorDiv = document.querySelector('.error-message');
+      const successDiv = document.querySelector('.success-message');
+      const runButton = document.getElementById('run-button');
+
+      function showError(msg) {
+        messageContainer.style.display = 'block';
+        errorDiv.textContent = msg;
+        errorDiv.classList.add('show');
+        setTimeout(() => errorDiv.classList.remove('show'), 5000);
+      }
+
+      function showSuccess(msg) {
+        messageContainer.style.display = 'block';
+        successDiv.textContent = msg;
+        successDiv.classList.add('show');
+        setTimeout(() => successDiv.classList.remove('show'), 5000);
+      }
+
+      function isValidJSON(str) {
+        try { JSON.parse(str); return true; } catch { return false; }
+      }
+
+      runButton.addEventListener('click', () => {
+        const url = document.getElementById('url').value.trim();
+        if (!url) { showError('Please enter a URL'); return; }
+        try { new URL(url); } catch { showError('Please enter a valid URL'); return; }
+
+        const headers = document.getElementById('headers').value;
+        const cookies = document.getElementById('cookies').value;
+        const firefoxPrefs = document.getElementById('firefoxPrefs').value;
+
+        if (headers && !isValidJSON(headers)) { showError('Headers must be valid JSON'); return; }
+        if (cookies && !isValidJSON(cookies)) { showError('Cookies must be valid JSON'); return; }
+        if (firefoxPrefs && !isValidJSON(firefoxPrefs)) { showError('Firefox Preferences must be valid JSON'); return; }
+
+        const config = {
+          url,
+          browser: document.getElementById('browser').value,
+          width: parseInt(document.getElementById('width').value) || 1366,
+          height: parseInt(document.getElementById('height').value) || 768,
+          timeout: parseInt(document.getElementById('timeout').value) || 30000,
+          frameRate: parseInt(document.getElementById('frameRate').value) || 1,
+          disableJS: document.getElementById('disableJS').checked,
+          debug: document.getElementById('debug').checked,
+          html: document.getElementById('html').checked,
+          openHtml: document.getElementById('openHtml').checked,
+          list: document.getElementById('list').checked,
+          zip: document.getElementById('zip').checked,
+        };
+
+        if (headers) config.headers = JSON.parse(headers);
+        if (cookies) config.cookies = JSON.parse(cookies);
+        if (firefoxPrefs) config.firefoxPrefs = JSON.parse(firefoxPrefs);
+        const flags = document.getElementById('flags').value;
+        if (flags) config.flags = flags;
+        const blockDomains = document.getElementById('blockDomains').value;
+        if (blockDomains) config.blockDomains = blockDomains.split(',').map(d => d.trim());
+        const block = document.getElementById('block').value;
+        if (block) config.block = block.split(',').map(b => b.trim());
+        const connectionType = document.getElementById('connectionType').value;
+        if (connectionType) config.connectionType = connectionType;
+        const cpuThrottle = document.getElementById('cpuThrottle').value;
+        if (cpuThrottle) config.cpuThrottle = parseInt(cpuThrottle);
+        const authUsername = document.getElementById('authUsername').value;
+        const authPassword = document.getElementById('authPassword').value;
+        if (authUsername && authPassword) config.auth = { username: authUsername, password: authPassword };
+
+        showSuccess('Running advanced test...');
+        console.log('Advanced test configuration:', config);
+      });
+    })();
+  </script>
+  <script type="module">
+    import '/components/side-nav.ts';
+  </script>
+  </div>
+</body>
+</html>

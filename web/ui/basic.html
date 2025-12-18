@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic - Browser Agent</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div class="sidebar">
+    <side-nav active="/basic"></side-nav>
+  </div>
+  <div class="main-content">
+    <div class="container">
+    <h1>Basic Test Configuration</h1>
+    <p class="subtitle">Configure and run a basic browser performance test</p>
+    
+    <div class="form-card">
+      <div class="error-message"></div>
+      <div class="success-message"></div>
+      
+      <div class="form-group">
+        <label for="url-input">URL</label>
+        <input type="url" id="url-input" placeholder="https://example.com">
+        <div class="help-text">Enter the URL you want to test</div>
+      </div>
+
+      <div class="form-group">
+        <label for="browser-select">Browser</label>
+        <select id="browser-select">
+          <option value="chrome" selected>Chrome</option>
+          <option value="chrome-beta">Chrome Beta</option>
+          <option value="canary">Chrome Canary</option>
+          <option value="edge">Microsoft Edge</option>
+          <option value="safari">Safari</option>
+          <option value="firefox">Firefox</option>
+        </select>
+        <div class="help-text">Select the browser to use for testing</div>
+      </div>
+
+      <div class="button-group">
+        <button id="run-button" class="run-button">Run Test</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const urlInput = document.getElementById('url-input');
+      const browserSelect = document.getElementById('browser-select');
+      const runButton = document.getElementById('run-button');
+      const errorDiv = document.querySelector('.error-message');
+      const successDiv = document.querySelector('.success-message');
+
+      function showError(message) {
+        errorDiv.textContent = message;
+        errorDiv.classList.add('show');
+        setTimeout(() => errorDiv.classList.remove('show'), 5000);
+      }
+
+      function showSuccess(message) {
+        successDiv.textContent = message;
+        successDiv.classList.add('show');
+        setTimeout(() => successDiv.classList.remove('show'), 5000);
+      }
+
+      function handleRun() {
+        const url = urlInput.value.trim();
+        const browser = browserSelect.value;
+
+        if (!url) {
+          showError('Please enter a URL');
+          return;
+        }
+
+        try {
+          new URL(url);
+        } catch (e) {
+          showError('Please enter a valid URL (e.g., https://example.com)');
+          return;
+        }
+
+        showSuccess(`Running test for ${url} with ${browser}...`);
+        console.log('Running test:', { url, browser });
+      }
+
+      runButton.addEventListener('click', handleRun);
+      urlInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleRun();
+      });
+    })();
+  </script>
+  <script type="module">
+    import '/components/side-nav.ts';
+  </script>
+  </div>
+</body>
+</html>

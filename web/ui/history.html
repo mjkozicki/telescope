@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History - Browser Agent</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div class="sidebar">
+    <side-nav active="/history"></side-nav>
+  </div>
+  <div class="main-content">
+    <div class="container">
+    <h1>Test History</h1>
+    <p class="subtitle">View and manage your past test results</p>
+    <div class="history-list" id="history-list">
+      <div class="empty-state">No test history available</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const historyList = document.getElementById('history-list');
+      const testHistory = [
+        {
+          testId: '2024-01-15-abc123',
+          url: 'https://example.com',
+          browser: 'chrome',
+          status: 'success',
+          timestamp: new Date().toISOString(),
+          metrics: { loadTime: 2340, firstContentfulPaint: 1200, largestContentfulPaint: 2100 }
+        },
+        {
+          testId: '2024-01-14-def456',
+          url: 'https://playwright.dev',
+          browser: 'firefox',
+          status: 'completed',
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          metrics: { loadTime: 1890, firstContentfulPaint: 980, largestContentfulPaint: 1750 }
+        }
+      ];
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      }
+
+      function formatDuration(ms) {
+        if (ms < 1000) return `${ms}ms`;
+        if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+        return `${(ms / 60000).toFixed(1)}m`;
+      }
+
+      function getBrowserIcon(browser) {
+        const icons = { chrome: '🌐', 'chrome-beta': '🌐', canary: '🌐', edge: '🔷', safari: '🧭', firefox: '🦊' };
+        return icons[browser.toLowerCase()] || '🌐';
+      }
+
+      function renderHistory() {
+        if (testHistory.length === 0) {
+          historyList.innerHTML = '<div class="empty-state">No test history available</div>';
+          return;
+        }
+
+        historyList.innerHTML = testHistory.map(test => {
+          const metricsHtml = test.metrics ? `
+            <div class="metrics">
+              ${test.metrics.loadTime ? `<div class="metric-item"><span class="metric-label">Load Time:</span><span class="metric-value">${formatDuration(test.metrics.loadTime)}</span></div>` : ''}
+              ${test.metrics.firstContentfulPaint ? `<div class="metric-item"><span class="metric-label">FCP:</span><span class="metric-value">${formatDuration(test.metrics.firstContentfulPaint)}</span></div>` : ''}
+              ${test.metrics.largestContentfulPaint ? `<div class="metric-item"><span class="metric-label">LCP:</span><span class="metric-value">${formatDuration(test.metrics.largestContentfulPaint)}</span></div>` : ''}
+            </div>
+          ` : '';
+
+          return `
+            <div class="test-item">
+              <div class="test-header">
+                <div class="test-info">
+                  <div class="test-id">${test.testId || 'N/A'}</div>
+                  <div class="test-url">${test.url || 'No URL'}</div>
+                  <div class="test-meta">
+                    <span class="status-badge ${test.status}">${test.status || 'unknown'}</span>
+                    <span class="browser-badge"><span>${getBrowserIcon(test.browser)}</span><span>${test.browser || 'chrome'}</span></span>
+                    <span class="timestamp">${formatDate(test.timestamp || new Date().toISOString())}</span>
+                  </div>
+                  ${metricsHtml}
+                </div>
+                <div class="test-actions">
+                  <button class="action-button primary" onclick="viewDetails('${test.testId}')">View Details</button>
+                  <button class="action-button" onclick="downloadTest('${test.testId}')">Download</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.viewDetails = (testId) => {
+        console.log('View details for test:', testId);
+      };
+
+      window.downloadTest = (testId) => {
+        console.log('Download test:', testId);
+      };
+
+      renderHistory();
+    })();
+  </script>
+  <script type="module">
+    import '/components/side-nav.ts';
+  </script>
+  </div>
+</body>
+</html>

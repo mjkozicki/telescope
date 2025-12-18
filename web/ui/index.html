@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Browser Agent</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div class="sidebar">
+    <side-nav active="/"></side-nav>
+  </div>
+  <div class="main-content">
+    <div class="container">
+    <div class="hero">
+      <h1>Browser Agent</h1>
+      <p>A diagnostic, cross-browser performance testing agent</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">What It Collects</h2>
+      <div class="card">
+        <p>When you run the agent, it will load the page in the browser you chose and apply any special parameters you have provided. By default, it will store results for the test in a <code>results</code> directory (relative to the <code>agent</code> directory). Each test gets its own folder with the date prefixed, followed by a unique ID.</p>
+        <p><strong>Inside the test folder, the following files are added:</strong></p>
+        <ul class="file-list">
+          <li><code>console.json</code> - Console output from the page to look for warnings, JS errors, etc</li>
+          <li>a video file showing the page load progression</li>
+          <li><code>metrics.json</code> - A collection of timing metrics collected from the browser during page load</li>
+          <li><code>pageload.har</code> - A har file of the page load</li>
+          <li><code>resources.json</code> - The resource timing API data for the page</li>
+          <li><code>screenshot.png</code> - A screenshot of the final page load</li>
+          <li><code>/filmstrip</code> - A collection of screenshots during the page load that could be used for a filmstrip</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Parameters</h2>
+      <div class="card">
+        <p>A full list of parameters can be printed to the terminal by running <code>npx . --help</code> from the <code>agent</code> directory. Here's what's currently supported:</p>
+        <div class="params-grid">
+          <div class="param-item">
+            <strong>-u, --url &lt;url&gt;</strong>
+            <span>URL to run tests against</span>
+          </div>
+          <div class="param-item">
+            <strong>-b, --browser &lt;browser_name&gt;</strong>
+            <span>Browser to run tests with (choices: "chrome", "chrome-beta", "canary", "edge", "safari", "firefox", default: "chrome")</span>
+          </div>
+          <div class="param-item">
+            <strong>-h, --headers &lt;object&gt;</strong>
+            <span>Any custom headers to apply to requests</span>
+          </div>
+          <div class="param-item">
+            <strong>-c, --cookies &lt;object&gt;</strong>
+            <span>Any custom cookies to apply</span>
+          </div>
+          <div class="param-item">
+            <strong>-f, --flags &lt;string&gt;</strong>
+            <span>A comma separated list of Chromium flags to launch Chrome with</span>
+          </div>
+          <div class="param-item">
+            <strong>--blockDomains &lt;domains...&gt;</strong>
+            <span>A comma separated list of domains to block (default: [])</span>
+          </div>
+          <div class="param-item">
+            <strong>--block &lt;substrings...&gt;</strong>
+            <span>A comma-delimited list of urls to block (based on a substring match) (default: [])</span>
+          </div>
+          <div class="param-item">
+            <strong>--firefoxPrefs &lt;object&gt;</strong>
+            <span>Any Firefox User Preferences to apply (Firefox only)</span>
+          </div>
+          <div class="param-item">
+            <strong>--cpuThrottle &lt;int&gt;</strong>
+            <span>CPU throttling factor</span>
+          </div>
+          <div class="param-item">
+            <strong>--connectionType &lt;string&gt;</strong>
+            <span>Network connection type (choices: "cable", "dsl", "4g", "3g", "3gfast", "3gslow", "2g", "fios", default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--width &lt;int&gt;</strong>
+            <span>Viewport width, in pixels (default: "1366")</span>
+          </div>
+          <div class="param-item">
+            <strong>--height &lt;int&gt;</strong>
+            <span>Viewport height, in pixels (default: "768")</span>
+          </div>
+          <div class="param-item">
+            <strong>--frameRate &lt;int&gt;</strong>
+            <span>Filmstrip frame rate, in frames per second (default: 1)</span>
+          </div>
+          <div class="param-item">
+            <strong>--disableJS</strong>
+            <span>Disable JavaScript (default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--debug</strong>
+            <span>Output debug lines (default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--auth &lt;object&gt;</strong>
+            <span>Basic HTTP authentication (Expects: {"username": "", "password": ""}) (default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--timeout &lt;int&gt;</strong>
+            <span>Maximum time (in milliseconds) to wait for test to complete (default: 30000)</span>
+          </div>
+          <div class="param-item">
+            <strong>--html</strong>
+            <span>Generate HTML report (default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--openHtml</strong>
+            <span>Open HTML report in browser (requires --html) (default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--list</strong>
+            <span>Generate a list of test results as HTML (default: false)</span>
+          </div>
+          <div class="param-item">
+            <strong>--zip</strong>
+            <span>Zip the results of the test into the results directory (default: false)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Usage Examples</h2>
+      
+      <div class="card">
+        <h3>Custom Timeout</h3>
+        <p>You can set a custom timeout by passing the desired timeout in milliseconds using the <code>--timeout</code> parameter. Defaults to 30000, or 30 seconds.</p>
+        <div class="code-block"><code>cd agent
+npx . -u https://www.example.com -b chrome --timeout 50000</code></div>
+      </div>
+
+      <div class="card">
+        <h3>HTML Report Generation</h3>
+        <p><strong>Browser Support:</strong>
+          <span class="browser-support supported">✅ Edge</span>
+          <span class="browser-support supported">✅ Chrome</span>
+          <span class="browser-support supported">✅ Safari</span>
+          <span class="browser-support supported">✅ Firefox</span>
+        </p>
+        <p>You can generate an HTML report of your test results by passing the <code>--html</code> parameter. To automatically open the report in your default browser after generation, add the <code>--openHtml</code> flag.</p>
+        <div class="code-block"><code># Generate HTML report
+cd agent
+npx . -u https://example.com -b chrome --html
+
+# Generate and automatically open HTML report
+npx . -u https://example.com -b chrome --html --openHtml</code></div>
+      </div>
+
+      <div class="card">
+        <h3>Setting Custom Cookies</h3>
+        <p><strong>Browser support:</strong>
+          <span class="browser-support supported">✅ Edge</span>
+          <span class="browser-support supported">✅ Chrome</span>
+          <span class="browser-support not-supported">🚫 Safari</span>
+          <span class="browser-support supported">✅ Firefox</span>
+        </p>
+        <p>You can define custom cookies to be passed along to request when running your test using the <code>-c</code> or <code>--cookies</code> parameter.</p>
+        <div class="code-block"><code># Set a custom cookie for all requests
+cd agent
+npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar"}'
+
+# Set multiple cookies
+npx . -u https://www.example.com -b chrome -c '[{"name": "foo", "value": "bar"}, {"name": "foo2", "value": "bar2"}]'
+
+# Set a custom cookie for only a particular path
+npx . -u https://www.example.com -b chrome -c '{"name": "foo", "value": "bar", "domain":"www.example.com", "path":"/optim"}'</code></div>
+      </div>
+
+      <div class="card">
+        <h3>Disabling JavaScript</h3>
+        <p><strong>Browser Support:</strong>
+          <span class="browser-support supported">✅ Edge</span>
+          <span class="browser-support supported">✅ Chrome</span>
+          <span class="browser-support supported">✅ Safari</span>
+          <span class="browser-support supported">✅ Firefox</span>
+        </p>
+        <p>You can run tests with JavaScript disabled to see the impact on performance by passing the <code>--disableJS</code> parameter like so:</p>
+        <div class="code-block"><code>cd agent
+npx . -u https://playwright.dev/ -b firefox --disableJS</code></div>
+      </div>
+
+      <div class="card">
+        <h3>Basic HTTP Authentication</h3>
+        <p><strong>Browser Support:</strong>
+          <span class="browser-support supported">✅ Edge</span>
+          <span class="browser-support supported">✅ Chrome</span>
+          <span class="browser-support supported">✅ Safari</span>
+          <span class="browser-support supported">✅ Firefox</span>
+        </p>
+        <p>To test sites protected with HTTP authentication, you can pass the <code>--auth</code> parameter. It expects an object with a <code>username</code> and <code>password</code> like so:</p>
+        <div class="code-block"><code>cd agent
+npx . -u https://newsletter.www.example.com/admin -b safari --auth '{"username": "username", "password": "password"}'</code></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Installation</h2>
+      
+      <div class="card">
+        <h3>NPM Dependencies</h3>
+        <p>After checking out the code, navigate to the <code>agent</code> directory and install all the dependencies:</p>
+        <div class="code-block"><code>cd agent
+npm install</code></div>
+      </div>
+
+      <div class="card">
+        <h3>Browsers</h3>
+        <p><strong>Chrome, Firefox, Safari and Chrome Canary</strong></p>
+        <p>Telescope uses Playwright to control and manage individual browser engines. Telescope will automatically run <code>npx playwright install</code> to install Chrome, Firefox, Chrome Canary and Safari (webkit).</p>
+        <p><em>Note: Safari for MacOS Tahoe is now available in <code>playwright@next</code> version so we use that until it is available on the <code>@latest</code> channel.</em></p>
+        
+        <p><strong>Microsoft Edge and Chrome-beta</strong></p>
+        <p>To install Microsoft Edge or Chrome Beta playwright requires root privileges and will not automatically install them, all you have to do that is to run <code>npx playwright install msedge chrome-beta</code> from the <code>agent</code> directory (and provide root password).</p>
+      </div>
+
+      <div class="card">
+        <h3>ffmpeg</h3>
+        <p>Telescope uses <code>ffmpeg</code> to process the video and generate filmstrip images. You will need to have it installed on your machine.</p>
+        <p>For MacOS you can use <code>homebrew</code> to install it:</p>
+        <div class="code-block"><code>brew install ffmpeg</code></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Programmatic Usage</h2>
+      <div class="card">
+        <p>You can run telescope from within a Node.js script. If using from the repository, import from the <code>agent</code> directory:</p>
+        <div class="code-block"><code>import { launchTest } from './agent/index.js';
+
+const result = await launchTest({
+  url: 'https://example.com',
+  browser: 'chrome',
+  width: 1920,
+  height: 1080,
+  timeout: 60000,
+});
+
+if (result.success) {
+  console.log(\`Test completed: \${result.testId}\`);
+  console.log(\`Results saved to: \${result.resultsPath}\`);
+} else {
+  console.error(\`Test failed: \${result.error}\`);
+}</code></div>
+        <p>All CLI options are supported as object properties. See Parameters section for available options.</p>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script type="module">
+    import '/components/side-nav.ts';
+  </script>
+</body>
+</html>

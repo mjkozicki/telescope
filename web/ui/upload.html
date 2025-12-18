@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload - Browser Agent</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div class="sidebar">
+    <side-nav active="/upload"></side-nav>
+  </div>
+  <div class="main-content">
+    <div class="container">
+    <h1>Upload ZIP Files</h1>
+    <p class="subtitle">Drag and drop ZIP files here or click to browse</p>
+    
+    <div class="error-message" id="error-message"></div>
+    
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-zone-icon">📦</div>
+      <div class="drop-zone-text" id="drop-zone-text">Drag & drop ZIP files here</div>
+      <div class="drop-zone-hint">or click to browse files</div>
+      <input type="file" id="file-input" accept=".zip,application/zip,application/x-zip-compressed" multiple>
+    </div>
+
+    <div id="files-section" style="display: none;">
+      <div class="files-section">
+        <h2 class="files-section-title" id="files-title">Selected Files (0)</h2>
+        <div class="files-list" id="files-list"></div>
+      </div>
+    </div>
+
+    <div class="empty-state simple" id="empty-state">
+      <p>No files selected. Drop ZIP files above to get started.</p>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const dropZoneText = document.getElementById('drop-zone-text');
+      const errorMessage = document.getElementById('error-message');
+      const filesSection = document.getElementById('files-section');
+      const filesList = document.getElementById('files-list');
+      const filesTitle = document.getElementById('files-title');
+      const emptyState = document.getElementById('empty-state');
+      let files = [];
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+        document.body.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+      });
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.add('dragging');
+          dropZoneText.textContent = 'Drop your ZIP files here';
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.remove('dragging');
+          dropZoneText.textContent = 'Drag & drop ZIP files here';
+        }, false);
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt.files) handleFiles(Array.from(dt.files));
+      }, false);
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files) handleFiles(Array.from(e.target.files));
+      });
+
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      function handleFiles(newFiles) {
+        const zipFiles = newFiles.filter(file => {
+          const isZip = file.name.toLowerCase().endsWith('.zip') || 
+                        file.type === 'application/zip' ||
+                        file.type === 'application/x-zip-compressed';
+          return isZip;
+        });
+
+        if (zipFiles.length !== newFiles.length) {
+          showError('Only ZIP files are allowed. Please select ZIP files only.');
+        }
+
+        if (zipFiles.length > 0) {
+          files = [...files, ...zipFiles];
+          renderFiles();
+        }
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+      }
+
+      function removeFile(index) {
+        files.splice(index, 1);
+        renderFiles();
+      }
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        setTimeout(() => { errorMessage.style.display = 'none'; }, 5000);
+      }
+
+      function renderFiles() {
+        if (files.length === 0) {
+          filesSection.style.display = 'none';
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        filesSection.style.display = 'block';
+        emptyState.style.display = 'none';
+        filesTitle.textContent = `Selected Files (${files.length})`;
+        filesList.innerHTML = files.map((file, index) => `
+          <div class="file-item">
+            <div class="file-info">
+              <span class="file-icon">📦</span>
+              <div class="file-details">
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${formatFileSize(file.size)}</div>
+              </div>
+            </div>
+            <button class="remove-btn" onclick="removeFile(${index})">×</button>
+          </div>
+        `).join('');
+      }
+
+      window.removeFile = removeFile;
+    })();
+  </script>
+  <script type="module">
+    import '/components/side-nav.ts';
+  </script>
+  </div>
+</body>
+</html>
