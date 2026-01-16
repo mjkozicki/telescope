@@ -1,0 +1,13 @@
+name = "telescope-web"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+# Uncomment and configure if using R2 for storing results
+# [[r2_buckets]]
+# binding = "RESULTS_BUCKET"
+# bucket_name = "telescope-results"
+
+# Uncomment and configure if using KV for metadata
+# [[kv_namespaces]]
+# binding = "RESULTS_KV"
+# id = "your-kv-namespace-id"

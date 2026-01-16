@@ -1,0 +1,55 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TopNav from '../../../components/TopNav.astro';
+import DataNav from '../../../components/DataNav.astro';
+
+const { testId } = Astro.params;
+---
+
+<Layout title={`Overview - ${testId} - Telescope`}>
+  <TopNav inactive="results" />
+  <DataNav active="overview" testId={testId} />
+  <section class="data-content">
+    <h1>Overview</h1>
+    <h2>Test results overview for {testId}</h2>
+    <div id="overview-container">
+      <p>Loading overview data...</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const testId = window.location.pathname.split('/').pop();
+  
+  async function loadOverview() {
+    try {
+      const [config, metrics] = await Promise.all([
+        fetch(`/api/results/${testId}/config.json`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/results/${testId}/metrics.json`).then(r => r.ok ? r.json() : null),
+      ]);
+      
+      const container = document.getElementById('overview-container');
+      if (!config && !metrics) {
+        container!.innerHTML = '<p>No data available for this test.</p>';
+        return;
+      }
+      
+      container!.innerHTML = `
+        <div class="overview-section">
+          <h3>Test Configuration</h3>
+          <pre>${JSON.stringify(config, null, 2)}</pre>
+        </div>
+        <div class="overview-section">
+          <h3>Metrics Summary</h3>
+          <pre>${JSON.stringify(metrics, null, 2)}</pre>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading overview:', error);
+      document.getElementById('overview-container')!.innerHTML = 
+        '<p style="color: rgba(255, 100, 100, 0.92);">Error loading overview data.</p>';
+    }
+  }
+  
+  loadOverview();
+</script>

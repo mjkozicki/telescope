@@ -1,0 +1,73 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TopNav from '../../../components/TopNav.astro';
+import DataNav from '../../../components/DataNav.astro';
+import MetricItem from '../../../components/MetricItem.astro';
+
+const { testId } = Astro.params;
+---
+
+<Layout title={`Metrics - ${testId} - Telescope`}>
+  <TopNav inactive="results" />
+  <DataNav active="metrics" testId={testId} />
+  <section class="data-content">
+    <h1>Metrics</h1>
+    <h2>View the metrics of the test.</h2>
+    <div id="metrics-container">
+      <p>Loading metrics...</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const testId = window.location.pathname.split('/').pop();
+  
+  async function loadMetrics() {
+    try {
+      const metrics = await fetch(`/api/results/${testId}/metrics.json`).then(r => r.ok ? r.json() : null);
+      
+      const container = document.getElementById('metrics-container');
+      if (!metrics) {
+        container!.innerHTML = '<p>No metrics available for this test.</p>';
+        return;
+      }
+      
+      // Render metrics using metric-item components
+      container!.innerHTML = `
+        <div class="overview-section">
+          <h3>Core Web Vitals</h3>
+          <div class="metrics-grid">
+            <metric-item label="LCP" value="${formatTime(metrics.largestContentfulPaint?.[0]?.renderTime || 0)}" description="Largest Contentful Paint"></metric-item>
+            <metric-item label="CLS" value="${calculateCLS(metrics.layoutShifts || []).toFixed(3)}" description="Cumulative Layout Shift"></metric-item>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading metrics:', error);
+      document.getElementById('metrics-container')!.innerHTML = 
+        '<p style="color: rgba(255, 100, 100, 0.92);">Error loading metrics.</p>';
+    }
+  }
+  
+  function formatTime(ms: number): string {
+    if (ms === 0 || !ms) return 'N/A';
+    if (ms < 1000) return `${Math.round(ms)}ms`;
+    return `${(ms / 1000).toFixed(2)}s`;
+  }
+  
+  function calculateCLS(layoutShifts: any[]): number {
+    if (!layoutShifts || layoutShifts.length === 0) return 0;
+    return layoutShifts.reduce((sum: number, shift: any) => sum + (shift.value || 0), 0);
+  }
+  
+  loadMetrics();
+</script>
+
+<style>
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+</style>

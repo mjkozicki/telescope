@@ -1,0 +1,112 @@
+---
+export interface Props {
+  label: string;
+  value: string;
+  description?: string;
+  status?: 'good' | 'needs-improvement' | 'poor';
+}
+
+const { label, value, description, status } = Astro.props;
+---
+
+<metric-item label={label} value={value} description={description} status={status}></metric-item>
+
+<script>
+  class MetricItem extends HTMLElement {
+    private _label: string = '';
+    private _value: string = '';
+    private _description: string = '';
+    private _status: 'good' | 'needs-improvement' | 'poor' | '' = '';
+
+    static get observedAttributes() {
+      return ['label', 'value', 'description', 'status'];
+    }
+
+    attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+      if (oldValue !== newValue) {
+        if (name === 'label') {
+          this._label = newValue || '';
+        } else if (name === 'value') {
+          this._value = newValue || '';
+        } else if (name === 'description') {
+          this._description = newValue || '';
+        } else if (name === 'status') {
+          this._status = (newValue as 'good' | 'needs-improvement' | 'poor' | '') || '';
+        }
+        this.render();
+      }
+    }
+
+    connectedCallback() {
+      this._label = this.getAttribute('label') || '';
+      this._value = this.getAttribute('value') || '';
+      this._description = this.getAttribute('description') || '';
+      this._status = (this.getAttribute('status') as 'good' | 'needs-improvement' | 'poor' | '') || '';
+      this.render();
+    }
+
+    private render() {
+      const statusClass = this._status ? `metric-item-${this._status}` : '';
+      this.className = statusClass;
+      const title = `${this._label}: ${this._value}`;
+      this.setAttribute('title', title);
+      
+      this.innerHTML = `
+        <div class="label">${this.escapeHtml(this._label)}</div>
+        <div class="value">${this.escapeHtml(this._value)}</div>
+        ${this._description ? `<div class="description">${this.escapeHtml(this._description)}</div>` : ''}
+      `;
+    }
+
+    private escapeHtml(text: string): string {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  }
+
+  customElements.define('metric-item', MetricItem);
+</script>
+
+<style>
+  metric-item {
+    display: block;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  metric-item .label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  metric-item .value {
+    font-size: 24px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: 4px;
+  }
+
+  metric-item .description {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+  }
+
+  metric-item.metric-item-good {
+    border-left: 4px solid var(--color-success);
+  }
+
+  metric-item.metric-item-needs-improvement {
+    border-left: 4px solid var(--color-warning);
+  }
+
+  metric-item.metric-item-poor {
+    border-left: 4px solid var(--color-danger);
+  }
+</style>
