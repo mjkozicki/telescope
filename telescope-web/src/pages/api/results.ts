@@ -15,8 +15,8 @@ export const GET: APIRoute = async ({ request }) => {
     if (typeof process !== 'undefined' && typeof process.cwd === 'function') {
       try {
         // Try to dynamically import Node.js modules
-        const fs = await import('fs').then(m => m.default || m).catch(() => null);
-        const path = await import('path').then(m => m.default || m).catch(() => null);
+        const fs = await import('node:fs').then(m => m.default || m).catch(() => null);
+        const path = await import('node:path').then(m => m.default || m).catch(() => null);
         
         if (fs && path && typeof fs.existsSync === 'function') {
           // Path to results directory relative to telescope-web

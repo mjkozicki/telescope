@@ -28,3 +28,8 @@ pnpm-debug.log*
 # Cloudflare
 .wrangler/
 .dev.vars
+
+# Local database files
+db/.wrangler/
+*.sqlite
+*.sqlite-journal

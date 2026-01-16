@@ -1,0 +1,15 @@
+# Example environment variables for local development
+# Copy this file to .dev.vars (which is gitignored) and fill in your values
+# These variables will be available in your Workers/Pages environment
+
+# Cloudflare API token for deployment (optional for local dev)
+# CLOUDFLARE_API_TOKEN=your_token_here
+
+# R2 bucket bindings (if using R2 for results storage)
+# RESULTS_BUCKET_NAME=telescope-results
+
+# KV namespace ID (if using KV for metadata)
+# RESULTS_KV_NAMESPACE_ID=your_kv_namespace_id
+
+# Custom configuration
+# API_URL=http://localhost:4321

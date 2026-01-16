@@ -4,8 +4,13 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:cloudflare": "wrangler pages dev ./dist --compatibility-date=2024-09-23 --local",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "wrangler pages dev ./dist --compatibility-date=2024-09-23 --local",
+    "deploy": "wrangler pages deploy ./dist",
+    "db:setup": "node scripts/setup-local-db.js",
+    "db:migrate": "wrangler d1 execute telescope-db --local --file=./db/schema.sql",
+    "db:query": "wrangler d1 execute telescope-db --local --command",
     "astro": "astro"
   },
   "dependencies": {
@@ -13,6 +18,7 @@
     "astro": "^5.16.11"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "wrangler": "^4.59.2"
   }
 }
