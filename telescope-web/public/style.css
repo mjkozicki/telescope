@@ -146,30 +146,67 @@ nav .gh:hover {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .result-card h3 {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  word-break: break-all;
 }
 
-.result-card p {
-  margin: 8px 0;
-  color: var(--muted);
-  font-size: 14px;
+.result-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.result-card a {
+.result-detail-item {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.result-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.result-value {
+  color: rgba(255, 255, 255, 0.85);
+  word-break: break-word;
+  flex: 1;
+}
+
+.result-value[title] {
+  cursor: help;
+}
+
+.result-actions {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.result-actions a {
   display: inline-block;
-  margin-top: 12px;
   padding: 8px 16px;
   background: var(--brand);
   color: var(--bg);
   text-decoration: none;
   border-radius: 6px;
   font-weight: 600;
+  font-size: 14px;
+  transition: opacity 0.2s ease;
 }
 
-.result-card a:hover {
+.result-actions a:hover {
   opacity: 0.9;
 }

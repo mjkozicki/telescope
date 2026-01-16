@@ -5,5 +5,13 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-  adapter: cloudflare()
+  adapter: cloudflare(),
+  vite: {
+    ssr: {
+      // Allow Node.js modules in SSR for development
+      external: [],
+      noExternal: ['fs', 'path']
+    }
+  },
+  output: 'server'
 });
