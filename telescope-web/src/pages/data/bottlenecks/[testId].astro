@@ -1,0 +1,197 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TopNav from '../../../components/TopNav.astro';
+import DataNav from '../../../components/DataNav.astro';
+
+const { testId } = Astro.params;
+
+export const prerender = false;
+---
+
+<Layout title={`Bottlenecks - ${testId} - Telescope`}>
+  <TopNav inactive="results" />
+  <DataNav active="bottlenecks" testId={testId} />
+  <section class="data-content">
+    <h1>Bottlenecks</h1>
+    <h2>Identify performance bottlenecks in the test.</h2>
+    <div id="bottlenecks-container">
+      <p>Loading bottlenecks analysis...</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const testId = window.location.pathname.split('/').pop();
+  
+  async function loadBottlenecks() {
+    try {
+      const [metrics, resources] = await Promise.all([
+        fetch(`/api/results/${testId}/metrics.json`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/results/${testId}/resources.json`).then(r => r.ok ? r.json() : null),
+      ]);
+      
+      const container = document.getElementById('bottlenecks-container');
+      if (!metrics && !resources) {
+        container!.innerHTML = '<p>No data available for bottlenecks analysis.</p>';
+        return;
+      }
+      
+      const bottlenecks: any[] = [];
+      const navTiming = metrics?.navigationTiming || {};
+      
+      // Analyze slow resources
+      if (resources && Array.isArray(resources)) {
+        const slowResources = resources
+          .filter((r: any) => (r.duration || 0) > 1000)
+          .sort((a: any, b: any) => (b.duration || 0) - (a.duration || 0))
+          .slice(0, 10);
+        
+        slowResources.forEach((resource: any) => {
+          bottlenecks.push({
+            type: 'slow-resource',
+            severity: 'warning',
+            title: 'Slow Resource',
+            description: `${resource.name || resource.url || 'Unknown'} took ${formatTime(resource.duration || 0)}`,
+            details: resource,
+          });
+        });
+      }
+      
+      // Analyze layout shifts
+      const layoutShifts = metrics?.layoutShifts || [];
+      if (layoutShifts.length > 5) {
+        bottlenecks.push({
+          type: 'layout-shifts',
+          severity: 'warning',
+          title: 'Multiple Layout Shifts',
+          description: `Found ${layoutShifts.length} layout shifts which can cause poor user experience`,
+        });
+      }
+      
+      // Analyze large resources
+      if (resources && Array.isArray(resources)) {
+        const largeResources = resources
+          .filter((r: any) => (r.transferSize || r.encodedBodySize || 0) > 1000000)
+          .sort((a: any, b: any) => (b.transferSize || b.encodedBodySize || 0) - (a.transferSize || a.encodedBodySize || 0))
+          .slice(0, 10);
+        
+        largeResources.forEach((resource: any) => {
+          bottlenecks.push({
+            type: 'large-resource',
+            severity: 'info',
+            title: 'Large Resource',
+            description: `${resource.name || resource.url || 'Unknown'} is ${formatBytes(resource.transferSize || resource.encodedBodySize || 0)}`,
+            details: resource,
+          });
+        });
+      }
+      
+      if (bottlenecks.length === 0) {
+        container!.innerHTML = `
+          <div class="overview-section">
+            <p style="color: var(--color-success);">✅ No major bottlenecks detected!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container!.innerHTML = `
+        <div class="overview-section">
+          <h3>Detected Bottlenecks (${bottlenecks.length})</h3>
+          <div class="bottlenecks-list">
+            ${bottlenecks.map((bottleneck: any, index: number) => `
+              <div class="bottleneck-item bottleneck-${bottleneck.severity}">
+                <div class="bottleneck-header">
+                  <span class="bottleneck-title">${escapeHtml(bottleneck.title)}</span>
+                  <span class="bottleneck-severity">${escapeHtml(bottleneck.severity)}</span>
+                </div>
+                <div class="bottleneck-description">${escapeHtml(bottleneck.description)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading bottlenecks:', error);
+      document.getElementById('bottlenecks-container')!.innerHTML = 
+        '<p style="color: rgba(255, 100, 100, 0.92);">Error loading bottlenecks analysis.</p>';
+    }
+  }
+  
+  function formatTime(ms: number): string {
+    if (ms === 0 || !ms) return 'N/A';
+    if (ms < 1000) return `${Math.round(ms)}ms`;
+    return `${(ms / 1000).toFixed(2)}s`;
+  }
+  
+  function formatBytes(bytes: number): string {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+  }
+  
+  function escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  loadBottlenecks();
+</script>
+
+<style>
+  .bottlenecks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .bottleneck-item {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border-left: 4px solid;
+  }
+
+  .bottleneck-warning {
+    border-left-color: var(--color-warning);
+    background: rgba(251, 191, 36, 0.08);
+  }
+
+  .bottleneck-info {
+    border-left-color: rgba(125, 211, 252, 0.8);
+    background: rgba(125, 211, 252, 0.05);
+  }
+
+  .bottleneck-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .bottleneck-title {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 14px;
+  }
+
+  .bottleneck-severity {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .bottleneck-description {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+</style>

@@ -1,0 +1,229 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TopNav from '../../../components/TopNav.astro';
+import DataNav from '../../../components/DataNav.astro';
+
+const { testId } = Astro.params;
+
+export const prerender = false;
+---
+
+<Layout title={`Console - ${testId} - Telescope`}>
+  <TopNav inactive="results" />
+  <DataNav active="console" testId={testId} />
+  <section class="data-content">
+    <h1>Console</h1>
+    <h2>View the console messages from the test.</h2>
+    <div id="console-container">
+      <p>Loading console messages...</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const testId = window.location.pathname.split('/').pop();
+  
+  async function loadConsole() {
+    try {
+      const messages = await fetch(`/api/results/${testId}/console.json`).then(r => r.ok ? r.json() : null);
+      
+      const container = document.getElementById('console-container');
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        container!.innerHTML = '<p>No console messages available for this test.</p>';
+        return;
+      }
+      
+      // Count messages by type
+      const counts: Record<string, number> = {};
+      const requiredTypes = ['error', 'warning', 'debug', 'info', 'log'];
+      requiredTypes.forEach(type => { counts[type] = 0; });
+      
+      messages.forEach((msg: any) => {
+        const type = msg.type || 'unknown';
+        if (requiredTypes.includes(type)) {
+          counts[type] = (counts[type] || 0) + 1;
+        } else {
+          counts[type] = (counts[type] || 0) + 1;
+        }
+      });
+      
+      container!.innerHTML = `
+        <div class="overview-section">
+          <h3 id="console-header">Console Messages (${messages.length})</h3>
+          <div class="console-counts-grid">
+            ${requiredTypes.map(type => `
+              <div class="console-count-item console-type-${type}">
+                <span class="console-count-type">${escapeHtml(type.charAt(0).toUpperCase() + type.slice(1))}</span>
+                <span class="console-count-value">${counts[type] || 0}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="overview-section">
+          <h3>Messages</h3>
+          <div class="console-messages">
+            ${messages.map((msg: any) => {
+              const type = msg.type || 'unknown';
+              const text = msg.text || '';
+              const location = msg.location || {};
+              const url = location.url || '';
+              const lineNumber = location.lineNumber || 0;
+              const columnNumber = location.columnNumber || 0;
+              
+              return `
+                <div class="console-message console-message-${type}">
+                  <div class="console-message-header">
+                    <span class="console-message-type console-type-${type}">${escapeHtml(type.toUpperCase())}</span>
+                    ${url ? `<span class="console-message-location">${escapeHtml(url)}${lineNumber > 0 ? `:${lineNumber}:${columnNumber}` : ''}</span>` : ''}
+                  </div>
+                  <div class="console-message-text">${escapeHtml(text)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading console:', error);
+      document.getElementById('console-container')!.innerHTML = 
+        '<p style="color: rgba(255, 100, 100, 0.92);">Error loading console messages.</p>';
+    }
+  }
+  
+  function escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  loadConsole();
+</script>
+
+<style>
+  .console-counts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .console-count-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    gap: 8px;
+  }
+
+  .console-count-type {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .console-count-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .console-type-error {
+    border-left-color: var(--color-danger);
+  }
+
+  .console-type-error .console-count-value {
+    color: var(--color-danger);
+  }
+
+  .console-type-warning {
+    border-left-color: var(--color-warning);
+  }
+
+  .console-type-warning .console-count-value {
+    color: var(--color-warning);
+  }
+
+  .console-type-log .console-count-value {
+    color: rgba(125, 211, 252, 0.9);
+  }
+
+  .console-type-info .console-count-value {
+    color: rgba(34, 211, 238, 0.9);
+  }
+
+  .console-type-debug .console-count-value {
+    color: rgba(167, 139, 250, 0.9);
+  }
+
+  .console-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .console-message {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 13px;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .console-message-error {
+    border-left-color: var(--color-danger);
+    background: rgba(239, 68, 68, 0.08);
+  }
+
+  .console-message-warning {
+    border-left-color: var(--color-warning);
+    background: rgba(251, 191, 36, 0.08);
+  }
+
+  .console-message-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .console-message-type {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .console-message-type.console-type-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--color-danger);
+  }
+
+  .console-message-type.console-type-warning {
+    background: rgba(251, 191, 36, 0.2);
+    color: var(--color-warning);
+  }
+
+  .console-message-location {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    word-break: break-all;
+  }
+
+  .console-message-text {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>

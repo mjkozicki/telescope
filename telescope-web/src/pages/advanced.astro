@@ -1,0 +1,468 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopNav from '../components/TopNav.astro';
+
+export const prerender = false;
+---
+
+<Layout title="Advanced Test - Telescope">
+  <TopNav active="advanced" />
+  <section class="data-content">
+    <h1>Advanced Test</h1>
+    <h2>Run a performance test with advanced configuration options.</h2>
+    
+    <div class="overview-section">
+      <form id="advanced-test-form" class="test-form">
+        <div class="form-section">
+          <h3>Basic Settings</h3>
+          <div class="form-group">
+            <label for="url">
+              <span>URL</span>
+              <span class="required">*</span>
+            </label>
+            <input 
+              type="url" 
+              id="url" 
+              name="url" 
+              required 
+              placeholder="https://example.com"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="browser">Browser</label>
+            <select id="browser" name="browser">
+              <option value="chrome" selected>Chrome</option>
+              <option value="chrome-beta">Chrome Beta</option>
+              <option value="canary">Chrome Canary</option>
+              <option value="edge">Edge</option>
+              <option value="firefox">Firefox</option>
+              <option value="safari">Safari</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="width">Width (px)</label>
+              <input type="number" id="width" name="width" value="1366" min="320" max="3840" />
+            </div>
+            <div class="form-group">
+              <label for="height">Height (px)</label>
+              <input type="number" id="height" name="height" value="768" min="240" max="2160" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Network Settings</h3>
+          <div class="form-group">
+            <label for="connectionType">Connection Type</label>
+            <select id="connectionType" name="connectionType">
+              <option value="">None (default)</option>
+              <option value="cable">Cable</option>
+              <option value="dls">DSL</option>
+              <option value="fios">FiOS</option>
+              <option value="4g">4G</option>
+              <option value="3g">3G</option>
+              <option value="3gfast">3G Fast</option>
+              <option value="3gslow">3G Slow</option>
+              <option value="2g">2G</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cpuThrottle">CPU Throttle Factor</label>
+            <input type="number" id="cpuThrottle" name="cpuThrottle" min="1" step="0.1" />
+            <span class="form-help">Throttle CPU by this factor (e.g., 4 = 4x slower)</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Request Configuration</h3>
+          <div class="form-group">
+            <label for="headers">Custom Headers (JSON)</label>
+            <textarea 
+              id="headers" 
+              name="headers" 
+              rows="3"
+              placeholder='{"X-Custom-Header": "value"}'
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="cookies">Custom Cookies (JSON)</label>
+            <textarea 
+              id="cookies" 
+              name="cookies" 
+              rows="3"
+              placeholder='{"cookieName": "cookieValue"}'
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="auth">HTTP Authentication (JSON)</label>
+            <textarea 
+              id="auth" 
+              name="auth" 
+              rows="2"
+              placeholder='{"username": "user", "password": "pass"}'
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="blockDomains">Block Domains</label>
+            <input 
+              type="text" 
+              id="blockDomains" 
+              name="blockDomains" 
+              placeholder="example.com, ads.example.com"
+            />
+            <span class="form-help">Comma-separated list of domains to block</span>
+          </div>
+
+          <div class="form-group">
+            <label for="block">Block URLs (substring match)</label>
+            <input 
+              type="text" 
+              id="block" 
+              name="block" 
+              placeholder="analytics, tracking"
+            />
+            <span class="form-help">Comma-separated list of URL substrings to block</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Browser Options</h3>
+          <div class="form-group">
+            <label for="flags">Chrome Flags</label>
+            <input 
+              type="text" 
+              id="flags" 
+              name="flags" 
+              placeholder="--disable-features=FeatureName,--disable-extensions"
+            />
+            <span class="form-help">Comma-separated list of Chromium flags</span>
+          </div>
+
+          <div class="form-group">
+            <label for="firefoxPrefs">Firefox Preferences (JSON)</label>
+            <textarea 
+              id="firefoxPrefs" 
+              name="firefoxPrefs" 
+              rows="2"
+              placeholder='{"network.trr.mode": 2}'
+            ></textarea>
+            <span class="form-help">Firefox only</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Test Options</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="frameRate">Frame Rate (fps)</label>
+              <input type="number" id="frameRate" name="frameRate" value="1" min="0.1" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="timeout">Timeout (ms)</label>
+              <input type="number" id="timeout" name="timeout" value="30000" min="1000" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="disableJS" name="disableJS" />
+              <span>Disable JavaScript</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="debug" name="debug" />
+              <span>Enable debug logging</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="html" name="html" />
+              <span>Generate HTML report</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="zip" name="zip" />
+              <span>Zip results</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="button button-primary">Run Test</button>
+          <button type="reset" class="button button-secondary">Reset</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="test-status" class="test-status" style="display: none;">
+      <div class="status-message"></div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const form = document.getElementById('advanced-test-form') as HTMLFormElement;
+  const statusDiv = document.getElementById('test-status') as HTMLElement;
+  const statusMessage = statusDiv.querySelector('.status-message') as HTMLElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const data: Record<string, any> = {};
+    
+    formData.forEach((value, key) => {
+      const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement | HTMLTextAreaElement;
+      
+      if (input?.type === 'checkbox') {
+        data[key] = (input as HTMLInputElement).checked;
+      } else if (key === 'width' || key === 'height' || key === 'frameRate' || key === 'timeout') {
+        const numValue = parseInt(value as string);
+        if (!isNaN(numValue) && numValue > 0) {
+          data[key] = numValue;
+        }
+      } else if (key === 'cpuThrottle') {
+        const numValue = parseFloat(value as string);
+        if (!isNaN(numValue) && numValue > 0) {
+          data[key] = numValue;
+        }
+      } else if (key === 'headers' || key === 'cookies' || key === 'auth' || key === 'firefoxPrefs') {
+        const textValue = (value as string).trim();
+        if (textValue) {
+          try {
+            data[key] = JSON.parse(textValue);
+          } catch {
+            statusMessage.innerHTML = `<p>Error: Invalid JSON in ${key}</p>`;
+            statusDiv.className = 'test-status status-error';
+            statusDiv.style.display = 'block';
+            return;
+          }
+        }
+      } else if (key === 'blockDomains' || key === 'block') {
+        const textValue = (value as string).trim();
+        if (textValue) {
+          data[key] = textValue.split(',').map(s => s.trim()).filter(s => s);
+        }
+      } else if (key === 'flags') {
+        const textValue = (value as string).trim();
+        if (textValue) {
+          data[key] = textValue;
+        }
+      } else if (value) {
+        data[key] = value;
+      }
+    });
+
+    statusDiv.style.display = 'block';
+    statusMessage.textContent = 'Starting test...';
+    statusDiv.className = 'test-status status-running';
+
+    try {
+      const response = await fetch('/api/test/run', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start test');
+      }
+
+      const result = await response.json();
+      
+      if (result.testId) {
+        statusMessage.innerHTML = `
+          <p>Test started successfully!</p>
+          <p>Test ID: <strong>${escapeHtml(result.testId)}</strong></p>
+          <p><a href="/data/overview/${result.testId}" class="button button-primary">View Results</a></p>
+        `;
+        statusDiv.className = 'test-status status-success';
+      } else {
+        throw new Error('No test ID returned');
+      }
+    } catch (error) {
+      statusMessage.innerHTML = `
+        <p>Error: ${escapeHtml((error as Error).message)}</p>
+      `;
+      statusDiv.className = 'test-status status-error';
+    }
+  });
+
+  function escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
+<style>
+  .test-form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 16px;
+  }
+
+  .form-section {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .form-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .required {
+    color: rgba(239, 68, 68, 0.9);
+  }
+
+  .form-help {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="url"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    font: inherit;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--text);
+    font-size: 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  .form-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .form-group label:has(input[type="checkbox"]) {
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .button {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .button-primary {
+    background: var(--brand);
+    color: var(--bg);
+  }
+
+  .button-primary:hover {
+    opacity: 0.9;
+  }
+
+  .button-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .button-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .test-status {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .status-running {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: var(--color-warning);
+  }
+
+  .status-success {
+    background: rgba(74, 222, 128, 0.1);
+    border-color: var(--color-success);
+  }
+
+  .status-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--color-danger);
+  }
+
+  .status-message p {
+    margin: 8px 0;
+  }
+
+  .status-message a {
+    display: inline-block;
+    margin-top: 8px;
+  }
+</style>

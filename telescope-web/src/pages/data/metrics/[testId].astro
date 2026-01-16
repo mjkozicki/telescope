@@ -5,6 +5,8 @@ import DataNav from '../../../components/DataNav.astro';
 import MetricItem from '../../../components/MetricItem.astro';
 
 const { testId } = Astro.params;
+
+export const prerender = false;
 ---
 
 <Layout title={`Metrics - ${testId} - Telescope`}>

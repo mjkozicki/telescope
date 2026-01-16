@@ -1,0 +1,177 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TopNav from '../../../components/TopNav.astro';
+import DataNav from '../../../components/DataNav.astro';
+
+const { testId } = Astro.params;
+
+export const prerender = false;
+---
+
+<Layout title={`Filmstrip & Video - ${testId} - Telescope`}>
+  <TopNav inactive="results" />
+  <DataNav active="filmstrip-video" testId={testId} />
+  <section class="data-content">
+    <h1>Filmstrip & Video</h1>
+    <h2>View the filmstrip and video of the test.</h2>
+    
+    <div id="filmstrip-container" class="overview-section">
+      <h3>Filmstrip</h3>
+      <div class="filmstrip-scroll" id="filmstrip-scroll">
+        <p>Loading filmstrip...</p>
+      </div>
+    </div>
+
+    <div id="video-container" class="overview-section">
+      <h3>Video</h3>
+      <div class="video-wrapper">
+        <video id="test-video" controls style="width: 100%; max-width: 800px; border-radius: 6px;">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const testId = window.location.pathname.split('/').pop();
+  
+  async function loadFilmstrip() {
+    try {
+      // Try to load filmstrip frames
+      const frames: string[] = [];
+      let frameNum = 1;
+      const maxFrames = 100;
+      
+      while (frameNum <= maxFrames) {
+        const filename = `frame_1366x768_${frameNum}.jpg`;
+        try {
+          const response = await fetch(`/api/results/${testId}/filmstrip/${filename}`, { method: 'HEAD' });
+          if (response.ok) {
+            frames.push(filename);
+            frameNum++;
+          } else {
+            break;
+          }
+        } catch {
+          break;
+        }
+      }
+      
+      const scrollContainer = document.getElementById('filmstrip-scroll');
+      if (frames.length === 0) {
+        scrollContainer!.innerHTML = '<p>No filmstrip frames available.</p>';
+        return;
+      }
+      
+      scrollContainer!.innerHTML = `
+        <div class="filmstrip-frames">
+          ${frames.map((filename, index) => `
+            <div class="filmstrip-frame">
+              <img src="/api/results/${testId}/filmstrip/${filename}" alt="Frame ${index + 1}" loading="lazy" />
+              <div class="frame-number">Frame ${index + 1}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading filmstrip:', error);
+      document.getElementById('filmstrip-scroll')!.innerHTML = 
+        '<p style="color: rgba(255, 100, 100, 0.92);">Error loading filmstrip.</p>';
+    }
+  }
+  
+  async function loadVideo() {
+    try {
+      // Try to find video file
+      const videoExtensions = ['.webm', '.mp4', '.mov'];
+      let videoSrc = null;
+      
+      for (const ext of videoExtensions) {
+        try {
+          const response = await fetch(`/api/results/${testId}/video${ext}`, { method: 'HEAD' });
+          if (response.ok) {
+            videoSrc = `/api/results/${testId}/video${ext}`;
+            break;
+          }
+        } catch {}
+      }
+      
+      const videoElement = document.getElementById('test-video') as HTMLVideoElement;
+      if (videoSrc) {
+        videoElement.src = videoSrc;
+      } else {
+        videoElement.style.display = 'none';
+        document.getElementById('video-container')!.innerHTML = 
+          '<p>No video file available for this test.</p>';
+      }
+    } catch (error) {
+      console.error('Error loading video:', error);
+    }
+  }
+  
+  loadFilmstrip();
+  loadVideo();
+</script>
+
+<style>
+  .filmstrip-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    margin-top: 16px;
+  }
+
+  .filmstrip-scroll::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .filmstrip-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .filmstrip-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+
+  .filmstrip-frames {
+    display: flex;
+    gap: 12px;
+  }
+
+  .filmstrip-frame {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filmstrip-frame img {
+    height: 140px;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .frame-number {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .video-wrapper {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  #test-video {
+    background: rgba(0, 0, 0, 0.2);
+  }
+</style>

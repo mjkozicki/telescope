@@ -1,0 +1,152 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import TopNav from '../../../components/TopNav.astro';
+import DataNav from '../../../components/DataNav.astro';
+
+const { testId } = Astro.params;
+
+export const prerender = false;
+---
+
+<Layout title={`Resources - ${testId} - Telescope`}>
+  <TopNav inactive="results" />
+  <DataNav active="resources" testId={testId} />
+  <section class="data-content">
+    <h1>Resources</h1>
+    <h2>View the resources loaded during the test.</h2>
+    <div id="resources-container">
+      <p>Loading resources...</p>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const testId = window.location.pathname.split('/').pop();
+  
+  async function loadResources() {
+    try {
+      const resources = await fetch(`/api/results/${testId}/resources.json`).then(r => r.ok ? r.json() : null);
+      
+      const container = document.getElementById('resources-container');
+      if (!resources) {
+        container!.innerHTML = '<p>No resources available for this test.</p>';
+        return;
+      }
+      
+      const resourcesList = Array.isArray(resources) ? resources : [];
+      
+      container!.innerHTML = `
+        <div class="overview-section">
+          <h3>Resources (${resourcesList.length})</h3>
+          <div class="resources-table-container">
+            <table class="resources-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Size</th>
+                  <th>Duration</th>
+                  <th>Start Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${resourcesList.map((resource: any) => `
+                  <tr>
+                    <td class="resource-name" title="${escapeHtml(resource.name || resource.url || '')}">${escapeHtml((resource.name || resource.url || '').substring(0, 60))}</td>
+                    <td class="resource-type">${escapeHtml(resource.initiatorType || resource.type || 'other')}</td>
+                    <td class="resource-size">${formatBytes(resource.transferSize || resource.encodedBodySize || 0)}</td>
+                    <td class="resource-duration">${formatTime(resource.duration || 0)}</td>
+                    <td class="resource-start">${formatTime(resource.startTime || 0)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading resources:', error);
+      document.getElementById('resources-container')!.innerHTML = 
+        '<p style="color: rgba(255, 100, 100, 0.92);">Error loading resources.</p>';
+    }
+  }
+  
+  function formatTime(ms: number): string {
+    if (ms === 0 || !ms) return 'N/A';
+    if (ms < 1000) return `${Math.round(ms)}ms`;
+    return `${(ms / 1000).toFixed(2)}s`;
+  }
+  
+  function formatBytes(bytes: number): string {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+  }
+  
+  function escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  loadResources();
+</script>
+
+<style>
+  .resources-table-container {
+    margin-top: 16px;
+    overflow-x: auto;
+  }
+
+  .resources-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .resources-table thead {
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .resources-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .resources-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .resources-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .resource-name {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .resource-type {
+    text-transform: capitalize;
+  }
+
+  .resource-size,
+  .resource-duration,
+  .resource-start {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    text-align: right;
+  }
+</style>

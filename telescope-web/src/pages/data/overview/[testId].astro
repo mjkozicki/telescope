@@ -4,6 +4,8 @@ import TopNav from '../../../components/TopNav.astro';
 import DataNav from '../../../components/DataNav.astro';
 
 const { testId } = Astro.params;
+
+export const prerender = false;
 ---
 
 <Layout title={`Overview - ${testId} - Telescope`}>
