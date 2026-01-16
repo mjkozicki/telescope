@@ -7,6 +7,13 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   adapter: cloudflare(),
   vite: {
+    server: {
+      hmr: {
+        protocol: 'ws',
+        host: 'localhost',
+        port: 4321,
+      },
+    },
     ssr: {
       // Allow Node.js modules in SSR for development
       external: [],
