@@ -72,14 +72,15 @@ const { label, value, description, status } = Astro.props;
   metric-item {
     display: block;
     padding: 16px;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(0, 0, 0, 0.02);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   metric-item .label {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(0, 0, 0, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
@@ -88,13 +89,13 @@ const { label, value, description, status } = Astro.props;
   metric-item .value {
     font-size: 24px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.92);
+    color: rgba(0, 0, 0, 0.92);
     margin-bottom: 4px;
   }
 
   metric-item .description {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(0, 0, 0, 0.5);
     margin-top: 4px;
   }
 
