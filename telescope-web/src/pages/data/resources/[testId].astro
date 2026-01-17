@@ -25,7 +25,7 @@ export const prerender = false;
   
   async function loadResources() {
     try {
-      const resources = await fetch(`/api/results/${testId}/resources.json`).then(r => r.ok ? r.json() : null);
+      const resources = await fetch(`/api/data/${testId}/resources.json`).then(r => r.ok ? r.json() : null);
       
       const container = document.getElementById('resources-container');
       if (!resources) {

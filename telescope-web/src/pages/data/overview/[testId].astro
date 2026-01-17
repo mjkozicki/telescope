@@ -26,8 +26,8 @@ export const prerender = false;
   async function loadOverview() {
     try {
       const [config, metrics] = await Promise.all([
-        fetch(`/api/results/${testId}/config.json`).then(r => r.ok ? r.json() : null),
-        fetch(`/api/results/${testId}/metrics.json`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/data/${testId}/config.json`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/data/${testId}/metrics.json`).then(r => r.ok ? r.json() : null),
       ]);
       
       const container = document.getElementById('overview-container');

@@ -26,8 +26,8 @@ export const prerender = false;
   async function loadBottlenecks() {
     try {
       const [metrics, resources] = await Promise.all([
-        fetch(`/api/results/${testId}/metrics.json`).then(r => r.ok ? r.json() : null),
-        fetch(`/api/results/${testId}/resources.json`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/data/${testId}/metrics.json`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/data/${testId}/resources.json`).then(r => r.ok ? r.json() : null),
       ]);
       
       const container = document.getElementById('bottlenecks-container');

@@ -46,7 +46,7 @@ export const prerender = false;
       while (frameNum <= maxFrames) {
         const filename = `frame_1366x768_${frameNum}.jpg`;
         try {
-          const response = await fetch(`/api/results/${testId}/filmstrip/${filename}`, { method: 'HEAD' });
+          const response = await fetch(`/api/data/${testId}/filmstrip/${filename}`, { method: 'HEAD' });
           if (response.ok) {
             frames.push(filename);
             frameNum++;
@@ -68,7 +68,7 @@ export const prerender = false;
         <div class="filmstrip-frames">
           ${frames.map((filename, index) => `
             <div class="filmstrip-frame">
-              <img src="/api/results/${testId}/filmstrip/${filename}" alt="Frame ${index + 1}" loading="lazy" />
+              <img src="/api/data/${testId}/filmstrip/${filename}" alt="Frame ${index + 1}" loading="lazy" />
               <div class="frame-number">Frame ${index + 1}</div>
             </div>
           `).join('')}
@@ -89,9 +89,9 @@ export const prerender = false;
       
       for (const ext of videoExtensions) {
         try {
-          const response = await fetch(`/api/results/${testId}/video${ext}`, { method: 'HEAD' });
+          const response = await fetch(`/api/data/${testId}/video${ext}`, { method: 'HEAD' });
           if (response.ok) {
-            videoSrc = `/api/results/${testId}/video${ext}`;
+            videoSrc = `/api/data/${testId}/video${ext}`;
             break;
           }
         } catch {}

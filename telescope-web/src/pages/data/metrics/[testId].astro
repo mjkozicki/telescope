@@ -26,7 +26,7 @@ export const prerender = false;
   
   async function loadMetrics() {
     try {
-      const metrics = await fetch(`/api/results/${testId}/metrics.json`).then(r => r.ok ? r.json() : null);
+      const metrics = await fetch(`/api/data/${testId}/metrics.json`).then(r => r.ok ? r.json() : null);
       
       const container = document.getElementById('metrics-container');
       if (!metrics) {

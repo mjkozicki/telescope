@@ -25,7 +25,7 @@ export const prerender = false;
   
   async function loadWaterfall() {
     try {
-      const harData = await fetch(`/api/results/${testId}/pageload.har`).then(r => r.ok ? r.json() : null);
+      const harData = await fetch(`/api/data/${testId}/pageload.har`).then(r => r.ok ? r.json() : null);
       
       const container = document.getElementById('waterfall-container');
       if (!harData || !harData.log || !harData.log.entries) {
