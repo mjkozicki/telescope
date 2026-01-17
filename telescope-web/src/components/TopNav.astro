@@ -59,7 +59,7 @@ const { active, inactive } = Astro.props;
           this._activeTab = 'basic';
         } else if (path.startsWith('/advanced')) {
           this._activeTab = 'advanced';
-        } else if (path.startsWith('/results')) {
+        } else if (path.startsWith('/data')) {
           this._activeTab = 'results';
         } else if (path.startsWith('/upload')) {
           this._activeTab = 'upload';
@@ -93,7 +93,7 @@ const { active, inactive } = Astro.props;
         { name: 'home', label: 'Home', href: '/' },
         { name: 'basic', label: 'Basic', href: '/basic' },
         { name: 'advanced', label: 'Advanced', href: '/advanced' },
-        { name: 'results', label: 'Results', href: '/results' },
+        { name: 'results', label: 'Results', href: '/data' },
         { name: 'upload', label: 'Upload', href: '/upload' },
       ];
 
