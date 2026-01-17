@@ -3,11 +3,9 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
-    "dev:cloudflare": "wrangler pages dev ./dist --compatibility-date=2024-09-23 --local",
+    "dev": "astro dev --development",
     "build": "astro build",
-    "preview": "wrangler pages dev ./dist --compatibility-date=2024-09-23 --local",
-    "deploy": "wrangler pages deploy ./dist",
+    "cf": "astro build && wrangler dev",
     "db:setup": "node scripts/setup-local-db.js",
     "db:migrate": "wrangler d1 execute telescope-db --local --file=./db/schema.sql",
     "db:query": "wrangler d1 execute telescope-db --local --command",

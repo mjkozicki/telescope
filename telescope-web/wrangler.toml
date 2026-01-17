@@ -1,6 +1,7 @@
 name = "telescope-web"
+main = "dist/_worker.js/index.js"
+compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2024-09-23"
-pages_build_output_dir = "dist"
 
 # Local D1 database - for development/testing
 [[d1_databases]]

@@ -33,3 +33,5 @@ pnpm-debug.log*
 db/.wrangler/
 *.sqlite
 *.sqlite-journal
+# Localflare generated files
+.localflare/
