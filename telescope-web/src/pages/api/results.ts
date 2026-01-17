@@ -21,6 +21,7 @@ export const GET: APIRoute = async (context: any) => {
             owner
           FROM tests
           ORDER BY created_at DESC
+          LIMIT 50
         `);
 
     const { results: dbResults } = await stmt.all();

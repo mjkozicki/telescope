@@ -1,71 +1,100 @@
 import type { APIRoute } from 'astro';
-import { TestConfig } from '../../types/testConfig';
+import { TestConfig, TestSource, TestStatus } from '../../types/testConfig';
+import { readFileSync } from 'fs';
 
-export const POST: APIRoute = async ({ request, env }) => {
+/**
+ * Extract file list from ZIP archive
+ * Works in both Node.js (adm-zip) and Cloudflare Workers (fflate) environments
+ * @param buffer - ArrayBuffer containing ZIP file data
+ * @returns Promise<string[]> - Array of file paths/names in the ZIP
+ */
+async function getFilesFromZip(buffer: ArrayBuffer): Promise<Record<string, any>> {
+  const { unzipSync } = await import('fflate');
+  const uint8Array = new Uint8Array(buffer);
+  const unzipped = unzipSync(uint8Array);
+  return unzipped;
+}
+
+export const POST: APIRoute = async (context: any) => {
   try {
-    const formData = await request.formData();
+    const formData = await context.request?.formData();
     const file = formData.get('file') as File;
-    const testId = formData.get('testId') as string | null;
-    
     if (!file) {
       return new Response(JSON.stringify({ error: 'No file provided' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    
-    // Generate test ID if not provided
-    const finalTestId = testId?.trim() || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
     // Read file buffer
     const buffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(buffer);
-    
-    // Extract ZIP archive and store files
-    let config: TestConfig | null = null;
-    
-    // Create database entry
-    if (env?.DB) {
-      try {
-        const now = Math.floor(Date.now() / 1000);
-        const stmt = env.DB.prepare(`
-          INSERT INTO tests (
-            test_id, url, browser, width, height, status, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-        
-        await stmt.bind(
-          finalTestId,
-          url,
-          browser,
-          width,
-          height,
-          2, // status: 2 = completed
-          now,
-          now
-        ).run();
-      } catch (dbError) {
-        console.warn('Failed to create database entry:', dbError);
-        // Continue even if database insert fails
-      }
+    const unzipped = await getFilesFromZip(buffer);
+    const files = Object.keys(unzipped).filter(name => !name.endsWith('/'));
+    const fileKey = Object.keys(unzipped).filter(name => name.endsWith('/'))[0].replace('/', '');
+
+    // Access D1 database - try both env parameter and context.locals.runtime
+    const env = context.env || context.locals?.runtime?.env;
+    const existing = await env.RESULTS_BUCKET.get(fileKey);
+    if (existing) {
+      return new Response(JSON.stringify({ error: 'Test already exists' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
-    
-    return new Response(JSON.stringify({ 
-      success: true, 
-      testId: finalTestId,
-      message: 'Upload processed successfully',
-      filesStored: true,
+    const configFile = `${fileKey}/config.json`;
+    if (!files.includes(configFile)) {  // check if the config file exists  
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'No config.json file found in the ZIP archive'
+      }), { status: 402, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // Extract and parse config.json - fflate returns Uint8Array, need to decode to string
+    const configData = unzipped[configFile];
+    if (!configData) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Failed to extract config.json from ZIP'
+      }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    const configText = new TextDecoder('utf-8').decode(configData);
+    const config = JSON.parse(configText);
+
+    let testConfig = TestConfig.fromConfig(fileKey, config);
+    switch (testConfig.source) {
+      // if the source is upload, then we need to get the name and description from the form data
+      case TestSource.UPLOAD:
+        testConfig.name = formData.get('name') as string;
+        testConfig.description = formData.get('description') as string;
+        testConfig.source = (formData.get('source') as TestSource)
+        break;
+      // if the source is api, then we don't need to do anything
+      case TestSource.API:
+        break;
+      // if the source is agent, then we don't need to do anything
+      case TestSource.AGENT:
+        break;
+    }
+    testConfig.status = TestStatus.COMPLETED;
+
+    // store the zip file in the results bucket
+    // metadata will be pulled from the db
+    await env.RESULTS_BUCKET.put(fileKey, buffer);
+    // store the test config in the db
+    await testConfig.saveToD1(env);
+    return new Response(JSON.stringify({
+      success: true,
+      testId: testConfig.test_id,
+      message: 'Upload processed successfully'
     }), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Upload error:', error);
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: (error as Error).message 
+    return new Response(JSON.stringify({
+      success: false,
+      error: (error as Error).message
     }), {
       status: 500,
       headers: {
@@ -74,24 +103,3 @@ export const POST: APIRoute = async ({ request, env }) => {
     });
   }
 };
-
-function getContentType(filePath: string): string {
-  const ext = filePath.split('.').pop()?.toLowerCase();
-  switch (ext) {
-    case 'json': return 'application/json';
-    case 'har': return 'application/json';
-    case 'png': return 'image/png';
-    case 'jpg':
-    case 'jpeg': return 'image/jpeg';
-    case 'gif': return 'image/gif';
-    case 'webm': return 'video/webm';
-    case 'mp4': return 'video/mp4';
-    case 'mov': return 'video/quicktime';
-    case 'css': return 'text/css';
-    case 'js': return 'application/javascript';
-    case 'html': return 'text/html';
-    case 'txt': return 'text/plain';
-    case 'zip': return 'application/zip';
-    default: return 'application/octet-stream';
-  }
-}
