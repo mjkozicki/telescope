@@ -13,23 +13,14 @@ export const prerender = false;
     
     <div class="overview-section">
       <form id="basic-test-form" class="test-form">
+        <input type="hidden" name="source" value="basic" />
         <div class="form-group">
-          <label for="url">
-            <span>URL</span>
-            <span class="required">*</span>
-          </label>
-          <input 
-            type="url" 
-            id="url" 
-            name="url" 
-            required 
-            placeholder="https://example.com"
-            value=""
-          />
+          <label for="url"><span>URL</span><span class="required">*</span></label>
+          <input  type="url"  id="url"  name="url"  required  placeholder="https://example.com" value="" />       
         </div>
 
         <div class="form-group">
-          <label for="browser">Browser</label>
+          <label for="browser"><span>Browser</span><span class="required">*</span></label>
           <select id="browser" name="browser">
             <option value="chrome" selected>Chrome</option>
             <option value="chrome-beta">Chrome Beta</option>
@@ -40,40 +31,17 @@ export const prerender = false;
           </select>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="width">Width (px)</label>
-            <input 
-              type="number" 
-              id="width" 
-              name="width" 
-              value="1366"
-              min="320"
-              max="3840"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="height">Height (px)</label>
-            <input 
-              type="number" 
-              id="height" 
-              name="height" 
-              value="768"
-              min="240"
-              max="2160"
-            />
-          </div>
+        <div class="form-group">
+          <label for="name"><span>Name (optional)</span></label>
+          <input type="text" id="name" name="name" />
         </div>
 
         <div class="form-group">
-          <label>
-            <input type="checkbox" id="html" name="html" />
-            <span>Generate HTML report</span>
-          </label>
+          <label for="description"><span>Description (optional)</span></label>
+          <textarea rows="3" id="description" name="description"></textarea>
         </div>
 
-        <div class="form-actions">
+      <div class="form-actions">
           <button type="submit" class="button button-primary">Run Test</button>
           <button type="reset" class="button button-secondary">Reset</button>
         </div>
@@ -87,26 +55,20 @@ export const prerender = false;
 </Layout>
 
 <script>
+
   const form = document.getElementById('basic-test-form') as HTMLFormElement;
   const statusDiv = document.getElementById('test-status') as HTMLElement;
   const statusMessage = statusDiv.querySelector('.status-message') as HTMLElement;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     
     const formData = new FormData(form);
     const data: Record<string, any> = {};
-    
     formData.forEach((value, key) => {
-      if (key === 'html') {
-        data[key] = (form.querySelector(`#${key}`) as HTMLInputElement).checked;
-      } else if (key === 'width' || key === 'height') {
-        data[key] = parseInt(value as string);
-      } else {
         data[key] = value;
-      }
     });
-
     statusDiv.style.display = 'block';
     statusMessage.textContent = 'Starting test...';
     statusDiv.className = 'test-status status-running';
@@ -187,14 +149,21 @@ export const prerender = false;
   .form-group input[type="text"],
   .form-group input[type="url"],
   .form-group input[type="number"],
-  .form-group select {
+  .form-group select,
+  .form-group textarea {
     font: inherit;
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.25);
+    background: #fefefe;
     color: var(--text);
     font-size: 14px;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    font-family: inherit;
+    background: #fefefe;
   }
 
   .form-group input[type="checkbox"] {

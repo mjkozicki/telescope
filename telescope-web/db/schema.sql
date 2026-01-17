@@ -5,12 +5,13 @@
 CREATE TABLE IF NOT EXISTS tests (
   test_id TEXT PRIMARY KEY,
   name TEXT,
-  description TEXT,
-  owner TEXT, -- user id or email
+  source TEXT, -- basic, advanced, upload, api, cli
+  owner TEXT, -- user id or email?
   cli_command TEXT,
   url TEXT NOT NULL,
-  browser NOT NULL TEXT,
+  browser TEXT NOT NULL,
   -- all the cli options for the test, these would be overrides of the default options
+  device TEXT,
   headers TEXT,
   cookies TEXT,
   flags TEXT,
@@ -18,15 +19,15 @@ CREATE TABLE IF NOT EXISTS tests (
   block TEXT,
   firefox_prefs TEXT,
   cpu_throttle REAL,
-  connection_type TEXT
+  connection_type TEXT,
   width INTEGER,
   height INTEGER,
   frame_rate INTEGER,
   disable_js BOOLEAN,
-  debug BOOLEAN,,
+  debug BOOLEAN,
   auth TEXT,
   timeout INTEGER,
-  status INTEGER NOT NULL, -- 0: pending, 1: running, 2: completed, 3: failed
+  status INTEGER NOT NULL DEFAULT 0, -- 0: pending, 1: running, 2: completed, 3: aborted, 4: failed
   created_at INTEGER DEFAULT (unixepoch()),
   updated_at INTEGER DEFAULT (unixepoch())
 );

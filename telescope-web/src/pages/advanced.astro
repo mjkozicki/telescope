@@ -13,6 +13,7 @@ export const prerender = false;
     
     <div class="overview-section">
       <form id="advanced-test-form" class="test-form">
+        <input type="hidden" name="source" value="advanced" />
         <div class="form-section">
           <h3>Basic Settings</h3>
           <div class="form-group">
@@ -41,15 +42,14 @@ export const prerender = false;
             </select>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="width">Width (px)</label>
-              <input type="number" id="width" name="width" value="1366" min="320" max="3840" />
-            </div>
-            <div class="form-group">
-              <label for="height">Height (px)</label>
-              <input type="number" id="height" name="height" value="768" min="240" max="2160" />
-            </div>
+          <div class="form-group">
+            <label for="name"><span>Name (optional)</span></label>
+            <input type="text" id="name" name="name" />
+          </div>
+
+          <div class="form-group">
+            <label for="description"><span>Description (optional)</span></label>
+            <textarea rows="3" id="description" name="description"></textarea>
           </div>
         </div>
 
@@ -134,6 +134,18 @@ export const prerender = false;
 
         <div class="form-section">
           <h3>Browser Options</h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="width">Width (px) 1366 (default)</label>
+              <input type="number" id="width" name="width" value="" min="320" max="3840" />
+            </div>
+            <div class="form-group">
+              <label for="height">Height (px) 768 (default)</label>
+              <input type="number" id="height" name="height" value="" min="240" max="2160" />
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="flags">Chrome Flags</label>
             <input 
@@ -155,26 +167,26 @@ export const prerender = false;
             ></textarea>
             <span class="form-help">Firefox only</span>
           </div>
-        </div>
-
-        <div class="form-section">
-          <h3>Test Options</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="frameRate">Frame Rate (fps)</label>
-              <input type="number" id="frameRate" name="frameRate" value="1" min="0.1" step="0.1" />
-            </div>
-            <div class="form-group">
-              <label for="timeout">Timeout (ms)</label>
-              <input type="number" id="timeout" name="timeout" value="30000" min="1000" />
-            </div>
-          </div>
 
           <div class="form-group">
             <label>
               <input type="checkbox" id="disableJS" name="disableJS" />
               <span>Disable JavaScript</span>
             </label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Test Options</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="frameRate">Frame Rate (fps) 1 (default)</label>
+              <input type="number" id="frameRate" name="frameRate" value="" min="0.1" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label for="timeout">Timeout (ms) 30000 (default)</label>
+              <input type="number" id="timeout" name="timeout" value="" min="1000" />
+            </div>
           </div>
 
           <div class="form-group">
@@ -370,14 +382,12 @@ export const prerender = false;
   .form-group input[type="number"],
   .form-group select,
   .form-group textarea {
-    font: inherit;
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.25);
+    background:#fefefe;
     color: var(--text);
     font-size: 14px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   }
 
   .form-group textarea {
