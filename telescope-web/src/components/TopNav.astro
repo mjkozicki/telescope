@@ -68,7 +68,24 @@ const { active, inactive } = Astro.props;
         }
       }
       
+      // Initialize theme from localStorage or system preference
+      this.initTheme();
       this.render();
+    }
+
+    private initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    private toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      this.render(); // Re-render to update icon
     }
 
     private render() {
@@ -79,6 +96,9 @@ const { active, inactive } = Astro.props;
         { name: 'results', label: 'Results', href: '/results' },
         { name: 'upload', label: 'Upload', href: '/upload' },
       ];
+
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+      const themeIcon = currentTheme === 'dark' ? '☀️' : '🌙';
 
       this.innerHTML = `
         <nav class="top-nav">
@@ -101,11 +121,20 @@ const { active, inactive } = Astro.props;
               .join('')}
           </div>
           <div class="spacer"></div>
+          <button class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+            ${themeIcon}
+          </button>
           <a class="gh" href="https://github.com/cloudflare/telescope" target="_blank" rel="noreferrer">
               GitHub ↗
           </a>
         </nav>
       `;
+
+      // Attach event listener to theme toggle button
+      const themeButton = this.querySelector('.theme-toggle');
+      if (themeButton) {
+        themeButton.addEventListener('click', () => this.toggleTheme());
+      }
     }
   }
 
