@@ -2,16 +2,9 @@ import type { APIRoute } from 'astro';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, request, env }: any) => {
-  const { testId } = params;
-  console.log('testId', testId);
-  if (!testId) {
-    return new Response(JSON.stringify({ error: 'Test ID required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
+export const GET: APIRoute = async (context: any) => {
+  const env = context.env || context.locals?.runtime?.env;
+  const { testId } = context.params;
   try {
     const stmt = env.DB.prepare(`
       SELECT 
@@ -23,15 +16,14 @@ export const GET: APIRoute = async ({ params, request, env }: any) => {
       WHERE test_id = ?
       LIMIT 1
     `);
-    const { results: results } = await stmt.bind(testId).all();
-    console.log('results', results);
-    if(results.length === 0) {
+    const { result: result } = await stmt.bind(testId).first();
+    if(!result) {
       return new Response(JSON.stringify({ error: 'Test not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    return new Response(JSON.stringify({ testId, result: results[0] }), {
+    return new Response(JSON.stringify({ testId, result }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
