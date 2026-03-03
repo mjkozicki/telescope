@@ -46,18 +46,18 @@ export function isCriticalPathEntry(entry: any, resourceData?: any): boolean {
   return false;
 }
 
-/** Assign colors for each resource type */
-function getColorForType(type: string): string {
-  const colors: Record<string, string> = {
-    HTML: "#ff7f0e",
-    CSS: "#1f77b4",
-    JS: "#9467bd",
-    Font: "#8c564b",
-    Image: "#2ca02c",
-    Other: "#7f7f7f",
-  };
-  return colors[type] || "#7f7f7f";
-}
+// /** Assign colors for each resource type */
+// function getColorForType(type: string): string {
+//   const colors: Record<string, string> = {
+//     HTML: "#ff7f0e",
+//     CSS: "#1f77b4",
+//     JS: "#9467bd",
+//     Font: "#8c564b",
+//     Image: "#2ca02c",
+//     Other: "#7f7f7f",
+//   };
+//   return colors[type] || "#7f7f7f";
+// }
 
 /**
  * Draw a waterfall chart for critical path entries

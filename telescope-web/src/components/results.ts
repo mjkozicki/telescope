@@ -1,5 +1,5 @@
 class ResultsList extends HTMLElement {
-  private resultsDir: string = '/results';
+  //private resultsDir: string = '/results';
 
   connectedCallback() {
     this.loadResults();
