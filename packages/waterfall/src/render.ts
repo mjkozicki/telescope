@@ -258,6 +258,8 @@ function renderRow(
     data-index="${index}"
     data-started="${data.started!}"
     data-time="${data.time!}"
+    data-request-headers="${JSON.stringify(entry.request.headers ?? [])}"
+    data-response-headers="${JSON.stringify(entry.response.headers ?? [])}"
     data-blocked="${data.blocked!}"
     ${queueingAttr}
     data-dns="${data.dns!}"

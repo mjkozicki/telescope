@@ -453,7 +453,8 @@ waterfall-chart:not(:defined) .wf-filters .wf-filter-btn:first-child {
   display: grid;
   grid-template-columns: var(--wf-grid-cols);
   align-items: center;
-  height: var(--wf-row-h, 1.75rem); /* set by wf-row--rh* class */
+  grid-template-rows: var(--wf-row-h, 1.75rem); /* resource summary */
+  height: auto;
   cursor: pointer;
   transition: background 0.1s;
   min-width: var(--wf-min-width, 0);
@@ -471,15 +472,45 @@ waterfall-chart:not(:defined) .wf-filters .wf-filter-btn:first-child {
 .wf-row.row--open {
   background: var(--wf-row-open-bg);
 }
-/* Keyboard focus ring on rows. Only fires for keyboard focus (:focus-visible)
-   so mouse users don't see an outline after click. JS upgrade sets role=button
-   and tabindex=0, which makes rows focusable. */
-.wf-row:focus {
-  outline: none;
-}
-.wf-row:focus-visible {
+/* Explicit row controls keep list semantics and provide native keyboard access. */
+.wf-row-action:focus-visible,
+.wf-panel-close:focus-visible {
   outline: 2px solid var(--wf-brand);
   outline-offset: -2px;
+}
+.wf-cell--actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  padding-inline: 0.25rem;
+}
+.wf-url-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wf-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--wf-muted);
+  cursor: pointer;
+}
+.wf-row-action:hover {
+  background: var(--wf-row-hover-bg);
+  color: var(--wf-text);
+}
+.wf-expand[aria-expanded='true'] svg {
+  transform: rotate(90deg);
 }
 
 /* ── Filter hover highlight ──────────────────────────────────────────────────
@@ -957,7 +988,7 @@ waterfall-chart:not(:defined) .wf-filters .wf-filter-btn:first-child {
 
 .wf-panel-body {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 .wf-panel-section {
   padding: 0.75rem 0.875rem;
@@ -1054,4 +1085,88 @@ waterfall-chart:not(:defined) .wf-filters .wf-filter-btn:first-child {
   padding-right: 0.625rem;
   white-space: nowrap;
   word-break: normal;
+}
+
+/* Inline details remain inside their resource row, so filters hide both. */
+.wf-panel.wf-panel--inline {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+  margin: 0;
+  border-radius: 0;
+  border-inline: 0;
+  cursor: auto;
+}
+
+/* Native dialog supplies focus containment, Escape, and a top-layer surface. */
+.wf-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(36rem, 100%);
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--wf-border);
+  background: var(--wf-panel);
+  color: var(--wf-text);
+  box-shadow: -8px 0 32px rgb(0 0 0 / 20%);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.wf-drawer::backdrop {
+  background: rgb(0 0 0 / 30%);
+}
+.wf-drawer > .wf-panel {
+  min-height: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.wf-drawer .wf-panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.wf-drawer .wf-panel-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+.wf-drawer .wf-panel-section {
+  border-right: 0;
+  border-bottom: 1px solid var(--wf-border);
+}
+@media (max-width: 600px) {
+  .wf-panel-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wf-panel-section {
+    border-right: 0;
+    border-bottom: 1px solid var(--wf-border);
+  }
+}
+
+.wf-headers-table td.wf-header-action {
+  width: 1.75rem;
+  padding-left: 0.25rem;
+  text-align: right;
+}
+.wf-copy-header[data-copy-state='copied'] {
+  color: var(--wf-success);
+}
+.wf-copy-header[data-copy-state='error'] {
+  color: var(--wf-danger);
+}
+.wf-copy-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

@@ -166,8 +166,11 @@ When the JS bundle is loaded the element gains:
 - **Timeline scrubber** — hover over the waterfall to see a vertical line
   labelled with the time in ms. The scrubber snaps to event lines (DCL, Load,
   LCP) and displays the full label (name + value) when within 8 px.
-- **Detail panel** — click any row to open a panel with timings, headers, and
-  general request/response info. Click again or use the × button to close.
+- **Resource details** — use the chevron beside a URL to expand/collapse
+  timings, headers, and general request/response info directly beneath its row.
+  The drawer icon opens the same details in a right-side drawer. Close the drawer
+  with ×, Escape, or a click outside it; focus returns to its button. Both controls
+  support keyboard activation. Clicking the resource row also toggles inline details.
 
 ## Theming
 
@@ -277,3 +280,5 @@ ephemeral server via `createFixtureServer()`.
 One test file — `toggle.test.ts` — _does_ use the demo pages, because it
 specifically tests the demo's theme-toggle widget (`public/theme.js`). Every
 other browser test uses the fixtures.
+
+# waterfall

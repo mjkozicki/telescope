@@ -85,9 +85,23 @@ function el<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
+function iconButton(className: string, label: string, paths: string) {
+  const btn = el('button', {
+    type: 'button',
+    className: `wf-row-action ${className}`,
+    title: label,
+    'aria-label': label,
+  });
+  // Only fixed, developer-owned SVG markup is passed to this helper.
+  btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+  return btn;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Custom element
 // ─────────────────────────────────────────────────────────────────────────────
+
+let chartId = 0;
 
 export class WaterfallChart extends HTMLElement {
   static observedAttributes = ['src'];
@@ -117,6 +131,9 @@ export class WaterfallChart extends HTMLElement {
   private _activePhaseFilters = new Set<string>();
   private _hiddenEvents = new Set<string>();
   private _openPanels = new Map<number, HTMLElement>();
+  private _detailId = `wf-details-${++chartId}`;
+  private _drawer: HTMLDialogElement | null = null;
+  private _drawerTrigger: HTMLButtonElement | null = null;
   private _pageTimings: HarPageTimings = {};
   private _totalMs = 0;
   private _originMs = 0;
@@ -142,6 +159,7 @@ export class WaterfallChart extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._closeDrawer(false);
     this._resizeObserver?.disconnect();
     this._resizeObserver = null;
   }
@@ -192,6 +210,7 @@ export class WaterfallChart extends HTMLElement {
    * call _buildDOM() to lay down a fresh skeleton ready for _loadHarData().
    */
   private _teardownAndBuild() {
+    this._closeDrawer(false);
     this.innerHTML = '';
     this._openPanels.clear();
     this._activeFilters = new Set(['all']);
@@ -352,13 +371,9 @@ export class WaterfallChart extends HTMLElement {
       })();
     this._renderEventFilters();
 
-    // Wire up row click + keyboard → detail panel.
-    // Rows aren't focusable by default; the helper adds role/tabindex/keydown
-    // handlers so keyboard users can open the same detail panel that click does.
+    // Add inline expansion and drawer controls to each adopted resource row.
     rows.forEach((li, i) => {
-      this._makeRowInteractive(li, () =>
-        this._togglePanel(i, this._allEntries[i]!),
-      );
+      this._makeRowInteractive(li, i, this._allEntries[i]!);
     });
 
     this._wireScrubber();
@@ -403,6 +418,26 @@ export class WaterfallChart extends HTMLElement {
     const startedDateTime = d['started'] ?? new Date().toISOString();
     const status = parseInt(statusText, 10) || 200;
 
+    // Header JSON is HTML-escaped by renderToHTML and decoded by the DOM.
+    // Older pre-rendered markup has no header attributes; keep it usable.
+    const readHeaders = (
+      value: string | undefined,
+    ): HarEntry['request']['headers'] => {
+      try {
+        const headers: unknown = JSON.parse(value ?? '[]');
+        if (!Array.isArray(headers)) return [];
+        return headers.filter(
+          (header): header is HarEntry['request']['headers'][number] =>
+            header !== null &&
+            typeof header === 'object' &&
+            typeof header.name === 'string' &&
+            typeof header.value === 'string',
+        );
+      } catch {
+        return [];
+      }
+    };
+
     return {
       startedDateTime,
       time,
@@ -411,7 +446,7 @@ export class WaterfallChart extends HTMLElement {
         method,
         url,
         httpVersion: protocol,
-        headers: [],
+        headers: readHeaders(d.requestHeaders),
         cookies: [],
         queryString: [],
         headersSize: -1,
@@ -421,7 +456,7 @@ export class WaterfallChart extends HTMLElement {
         status,
         statusText: status === 200 ? 'OK' : String(status),
         httpVersion: protocol,
-        headers: [],
+        headers: readHeaders(d.responseHeaders),
         cookies: [],
         content: { size: bodySize, mimeType: '' },
         redirectURL: '',
@@ -464,21 +499,18 @@ export class WaterfallChart extends HTMLElement {
   // ── ResizeObserver helper ─────────────────────────────────────────────────
 
   /**
-   * Watch the ruler element for a non-zero width, then render event lines
-   * once and disconnect. Stores the observer in _resizeObserver so that
-   * disconnectedCallback can clean it up if the element is removed before
-   * the ruler gains layout.
+   * Keep overlays aligned when the ruler or list changes size, including
+   * inline expansion, filtering, and responsive detail layout.
    */
   private _observeRulerForEventLines() {
     this._resizeObserver?.disconnect();
     this._resizeObserver = new ResizeObserver(() => {
       if (this._rulerEl.offsetWidth > 0) {
-        this._resizeObserver!.disconnect();
-        this._resizeObserver = null;
         this._renderEventLines();
       }
     });
     this._resizeObserver.observe(this._rulerEl);
+    this._resizeObserver.observe(this._listWrapEl);
   }
 
   // ── Initial DOM construction (dynamic path) ───────────────────────────────
@@ -884,15 +916,87 @@ export class WaterfallChart extends HTMLElement {
   // ── Detail panel ──────────────────────────────────────────────────────────
 
   private _togglePanel(index: number, entry: HarEntry) {
-    if (this._openPanels.has(index)) {
-      this._openPanels.get(index)!.remove();
+    const row = this._listEl.querySelector<HTMLElement>(
+      `[data-index="${index}"]`,
+    )!;
+    const trigger = row.querySelector<HTMLButtonElement>('.wf-expand')!;
+    const existing = this._openPanels.get(index);
+    if (existing) {
+      if (existing.contains(document.activeElement)) trigger.focus();
+      existing.remove();
       this._openPanels.delete(index);
-      this.querySelectorAll(`.wf-row[data-index="${index}"]`).forEach((r) =>
-        r.classList.remove('row--open'),
+    } else {
+      const panel = this._createPanel(index, entry, () =>
+        this._togglePanel(index, entry),
       );
-      return;
+      panel.id = `${this._detailId}-${index}`;
+      panel.classList.add('wf-panel--inline');
+      row.appendChild(panel);
+      this._openPanels.set(index, panel);
     }
+    const expanded = this._openPanels.has(index);
+    row.classList.toggle('row--open', expanded);
+    trigger.setAttribute('aria-expanded', String(expanded));
+    const label = `${expanded ? 'Collapse' : 'Expand'} resource #${index + 1}`;
+    trigger.setAttribute('aria-label', label);
+    trigger.title = label;
+  }
 
+  private _closeDrawer(restoreFocus = true) {
+    const trigger = this._drawerTrigger;
+    this._drawer?.close();
+    this._drawer?.remove();
+    this._drawer = null;
+    this._drawerTrigger = null;
+    if (restoreFocus && trigger?.isConnected) trigger.focus();
+  }
+
+  private _openDrawer(
+    index: number,
+    entry: HarEntry,
+    trigger: HTMLButtonElement,
+  ) {
+    this._closeDrawer(false);
+    const drawer = el('dialog', {
+      className: 'wf-drawer',
+      'aria-label': `Resource #${index + 1}: ${entry.request.url}`,
+    });
+    const panel = this._createPanel(index, entry, () => this._closeDrawer());
+    drawer.appendChild(panel);
+    drawer.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      this._closeDrawer();
+    });
+    drawer.addEventListener('click', (event) => {
+      if (event.target === drawer) this._closeDrawer();
+    });
+    drawer.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      const buttons = Array.from(
+        panel.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'),
+      );
+      const first = buttons[0]!;
+      const last = buttons[buttons.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+    this.appendChild(drawer);
+    this._drawer = drawer;
+    this._drawerTrigger = trigger;
+    drawer.showModal();
+    panel.querySelector<HTMLButtonElement>('.wf-panel-close')!.focus();
+  }
+
+  private _createPanel(
+    index: number,
+    entry: HarEntry,
+    onClose: () => void,
+  ): HTMLElement {
     const t = entry.timings;
     const size = entrySize(entry);
 
@@ -905,10 +1009,15 @@ export class WaterfallChart extends HTMLElement {
     titleEl.title = entry.request.url;
     const closeBtn = el(
       'button',
-      { type: 'button', className: 'wf-panel-close', title: 'Close' },
+      {
+        type: 'button',
+        className: 'wf-panel-close',
+        title: 'Close details',
+        'aria-label': 'Close details',
+      },
       '\u00d7',
     );
-    closeBtn.addEventListener('click', () => this._togglePanel(index, entry));
+    closeBtn.addEventListener('click', onClose);
     const hdr = el('div', { className: 'wf-panel-header' });
     hdr.append(titleEl, closeBtn);
     panel.appendChild(hdr);
@@ -1001,7 +1110,13 @@ export class WaterfallChart extends HTMLElement {
     timingWrap.appendChild(totalRow);
     body.appendChild(section('Timings', timingWrap));
 
-    // Headers (may be empty for entries reconstructed from static HTML)
+    const copyStatus = el('span', {
+      className: 'wf-copy-status',
+      role: 'status',
+    });
+    panel.appendChild(copyStatus);
+
+    // Headers (older static HTML may not include header data)
     const headersSection = (
       title: string,
       headers: HarEntry['request']['headers'],
@@ -1018,6 +1133,45 @@ export class WaterfallChart extends HTMLElement {
           const tr = el('tr');
           tr.appendChild(el('td', {}, h.name));
           tr.appendChild(el('td', {}, h.value));
+          const copyIcon =
+            '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>';
+          const label = `Copy header ${h.name}`;
+          const copy = iconButton('wf-copy-header', label, copyIcon);
+          const icon = copy.querySelector('svg')!;
+          let reset: ReturnType<typeof setTimeout> | undefined;
+          let copying = false;
+          copy.addEventListener('click', async (event) => {
+            event.stopPropagation();
+            if (copying) return;
+            copying = true;
+            clearTimeout(reset);
+            copyStatus.textContent = '';
+            try {
+              await navigator.clipboard.writeText(`${h.name}: ${h.value}`);
+              icon.innerHTML = '<path d="m5 12 4 4L19 6"/>';
+              copy.dataset.copyState = 'copied';
+              copy.title = 'Copied!';
+              copy.setAttribute('aria-label', `Copied header ${h.name}`);
+              copyStatus.textContent = `Copied header ${h.name}.`;
+            } catch {
+              icon.innerHTML = '<path d="M12 4v10m0 4v2"/>';
+              copy.dataset.copyState = 'error';
+              copy.title = 'Could not copy. Try again.';
+              copy.setAttribute('aria-label', `Retry copying header ${h.name}`);
+              copyStatus.textContent = `Could not copy header ${h.name}. Try again or select the header text to copy manually.`;
+            } finally {
+              copying = false;
+              reset = setTimeout(() => {
+                icon.innerHTML = copyIcon;
+                delete copy.dataset.copyState;
+                copy.title = label;
+                copy.setAttribute('aria-label', label);
+              }, 2000);
+            }
+          });
+          const action = el('td', { className: 'wf-header-action' });
+          action.appendChild(copy);
+          tr.appendChild(action);
           tbl.appendChild(tr);
         }
       }
@@ -1029,12 +1183,7 @@ export class WaterfallChart extends HTMLElement {
     );
     panel.appendChild(body);
 
-    // Insert immediately after the list wrapper
-    this._listWrapEl.after(panel);
-    this._openPanels.set(index, panel);
-    this.querySelectorAll(`.wf-row[data-index="${index}"]`).forEach((r) =>
-      r.classList.add('row--open'),
-    );
+    return panel;
   }
 
   // ── Ruler ─────────────────────────────────────────────────────────────────
@@ -1285,48 +1434,44 @@ export class WaterfallChart extends HTMLElement {
       );
       li.appendChild(this._makeTimelineCell(entry));
 
-      this._makeRowInteractive(li, () => this._togglePanel(i, entry));
+      this._makeRowInteractive(li, i, entry);
 
       this._listEl.appendChild(li);
     });
   }
 
-  /**
-   * Make a row `<li>` keyboard-accessible.
-   *
-   * Adds the ARIA semantics of a toggle button (`role="button"`,
-   * `aria-expanded`, `tabindex="0"`) and binds both click and Enter/Space
-   * keydown to the same activation callback. The shared callback keeps the
-   * row's `aria-expanded` value in sync with the open/closed state of its
-   * detail panel.
-   *
-   * Only called after JS upgrade — the static SSR HTML keeps plain
-   * non-focusable `<li>` rows because there is no handler to drive them.
-   */
-  private _makeRowInteractive(li: HTMLElement, onActivate: () => void) {
-    li.setAttribute('role', 'button');
-    li.setAttribute('tabindex', '0');
-    if (!li.hasAttribute('aria-expanded')) {
-      li.setAttribute(
-        'aria-expanded',
-        li.classList.contains('row--open') ? 'true' : 'false',
-      );
-    }
+  /** Add explicit keyboard-accessible controls only after JS enhancement. */
+  private _makeRowInteractive(li: HTMLElement, index: number, entry: HarEntry) {
+    const cell = li.querySelector<HTMLElement>('.wf-cell--url')!;
+    const urlText = el('span', { className: 'wf-url-text' });
+    urlText.append(...Array.from(cell.childNodes));
 
-    const activate = () => {
-      onActivate();
-      li.setAttribute(
-        'aria-expanded',
-        li.classList.contains('row--open') ? 'true' : 'false',
-      );
-    };
+    const expand = iconButton(
+      'wf-expand',
+      `Expand resource #${index + 1}`,
+      '<path d="m9 5 7 7-7 7"/>',
+    );
+    expand.setAttribute('aria-expanded', 'false');
+    expand.setAttribute('aria-controls', `${this._detailId}-${index}`);
+    expand.addEventListener('click', () => this._togglePanel(index, entry));
+    const drawer = iconButton(
+      'wf-open-drawer',
+      `Open resource #${index + 1} in drawer`,
+      '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16m-8-8h5m-2-2 2 2-2 2"/>',
+    );
+    drawer.setAttribute('aria-haspopup', 'dialog');
+    drawer.addEventListener('click', () =>
+      this._openDrawer(index, entry, drawer),
+    );
+    cell.classList.add('wf-cell--actions');
+    cell.append(expand, urlText, drawer);
 
-    li.addEventListener('click', activate);
-    li.addEventListener('keydown', (event: KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault(); // prevent space from scrolling the page
-        activate();
-      }
+    // Keep clicking the resource itself convenient, without treating nested
+    // buttons or selectable detail content as row activation.
+    li.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('button, .wf-panel')) return;
+      if (window.getSelection()?.toString()) return;
+      this._togglePanel(index, entry);
     });
   }
 }
